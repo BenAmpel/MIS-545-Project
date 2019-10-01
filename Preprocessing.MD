@@ -10,5 +10,5 @@ Deleted URL field from drivers.csv upon import
 Names are inconsistent and needed formatting
 
 
-## PositionText field within driverStandings, constructorStandings, and results files
+# PositionText field within driverStandings, constructorStandings, and results files
 The value of the positionText attribute is either an integer (finishing position), “R” (retired), “D” (disqualified), “E” (excluded), “W” (withdrawn), “F” (failed to qualify) or “N” (not classified).
