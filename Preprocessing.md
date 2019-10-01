@@ -9,13 +9,13 @@ As shown, highlighted by red boxes in the image, this data needed to be cleaned 
 
 The names were referenced with a master list of drivers who have competed in the F1 circuit. DOB was formatted originally as DD/MM/YYYY, and was changed to MM/DD/YYYY.
 
-#### **Below is a list of changes that were made during the cleaning process**
+#### **Below is a list of changes that were made during the MySQL merging process**
 
 * Had to delete urls from MySQL import as they were A) useless to predictions, and B) giving headaches
 * Deleted PositionText column from constructorStandings as it had the same values as Position
 * DOB in drivers.csv is not formatted properly, providing inconsistent dates across all fields. Cleaned DOB column for properly formatted dates
-* Deleted URL field from drivers.csv upon import
-* Names are inconsistent and needed formatting
+* Deleted URL field from numerous datasets upon import
+* Driver names are inconsistent and needed formatting (Done manually with a different list of all F1 drivers)
 
 **_Note:_ lap time may need to be ignored (minutes:seconds/miliseconds) as it might affect algorithm**
 
