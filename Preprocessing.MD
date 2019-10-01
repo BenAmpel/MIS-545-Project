@@ -1,5 +1,7 @@
 ### Data Cleaning Process
-The data cleaning process was initially performed upon loading CSVs into a MySQL database for further analysis.
+The data cleaning process was initially performed upon loading CSVs into a MySQL database for further analysis. Below is a sample of the raw data in some of the files, such as drivers:
+
+![Raw Data - Driver name, DOB](https://github.com/PurplelinkPL/MIS-545-Project/blob/master/images/raw-data.PNG)
 
 * Had to delete urls from MySQL import as they were A) useless to predictions, and B) giving headaches
 * Deleted PositionText column from constructorStandings as it had the same values as Position
