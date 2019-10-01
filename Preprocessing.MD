@@ -3,6 +3,12 @@ The data cleaning process was initially performed upon loading CSVs into a MySQL
 
 ![Raw Data - Driver name, DOB](https://github.com/PurplelinkPL/MIS-545-Project/blob/master/images/raw-data.PNG)
 
+As shown, highlighted by red boxes in the image, this data needed to be cleaned and normalized so that it could be properly imported. The image below is the change to the data so that it is normalized:
+
+![Clean Data - Driver name, DOB](https://github.com/PurplelinkPL/MIS-545-Project/blob/master/images/clean-data.PNG)
+
+The names were referenced with a master list of drivers who have competed in the F1 circuit. DOB was formatted originally as DD/MM/YYYY, and was changed to MM/DD/YYYY.
+
 * Had to delete urls from MySQL import as they were A) useless to predictions, and B) giving headaches
 * Deleted PositionText column from constructorStandings as it had the same values as Position
 * DOB in drivers.csv is not formatted properly, providing inconsistent dates across all fields. Cleaned DOB column for properly formatted dates
