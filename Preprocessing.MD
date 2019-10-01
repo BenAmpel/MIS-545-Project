@@ -7,7 +7,7 @@ The data cleaning process was initially performed upon loading CSVs into a MySQL
 * Deleted URL field from drivers.csv upon import
 * Names are inconsistent and needed formatting
 
-** __ Note: __ lap time may need to be ignored (minutes:seconds/miliseconds) as it might affect algorithm**
+**_Note:_ lap time may need to be ignored (minutes:seconds/miliseconds) as it might affect algorithm**
 
 ### PositionText field within driverStandings, constructorStandings, and results files
 The value of the positionText attribute is either an integer (finishing position), “R” (retired), “D” (disqualified), “E” (excluded), “W” (withdrawn), “F” (failed to qualify) or “N” (not classified).
