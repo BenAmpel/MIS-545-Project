@@ -24,9 +24,9 @@ The value of the positionText attribute is either an integer (finishing position
 
 ### Random Ideas for Data Transformation I'm getting from MIS 584 - Big Data
 ##### Can probably wait to be implemented until end of project, if at all - Ben
-Principal Component Analysis: Dimensionality Reduction based on variance 
-Heuristic Search: Not used as much anymore thanks to deep learning, but could be could for this project to select best features (needs all tested variables to be continuous however)
-One-Hot Encoding: For any categorical variables we have with less than 5 possible values
-Bins / Logarithmic Normalization: For continuous variables we have with a huge range of values (milliseconds for lap time maybe)
-Categorical Embedding
-Feature Creation 
+* Principal Component Analysis: Dimensionality Reduction based on variance 
+* Heuristic Search: Not used as much anymore thanks to deep learning, but could be could for this project to select best features (needs all tested variables to be continuous however)
+* One-Hot Encoding: For any categorical variables we have with less than 5 possible values
+* Categorical Embedding
+* Feature Creation 
+* Normalization: Min-Max, Z-Score, Decimal Scaling, Bins / Logarithmic: For continuous variables we have with a huge range of values (milliseconds for lap time maybe)
