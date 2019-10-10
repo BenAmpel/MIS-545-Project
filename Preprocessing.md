@@ -16,6 +16,8 @@ The names were referenced with a master list of drivers who have competed in the
 * DOB in drivers.csv is not formatted properly, providing inconsistent dates across all fields. Cleaned DOB column for properly formatted dates
 * Deleted URL field from numerous datasets upon import
 * Driver names are inconsistent and needed formatting (Done manually with a different list of all F1 drivers)
+* After complete merge, 70 columns remained. That was immediately reduced to 25 based on hand selected feature selection
+* Columns that were deleted included Primary key columns, duplicates, data known to be bad predictors (e.g. lat, long, driver number), data that was highly dependant (e.g. driver points compared to driver position)
 
 **_Note:_ lap time may need to be ignored (minutes:seconds/miliseconds) as it might affect algorithm**
 
