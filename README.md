@@ -1,5 +1,5 @@
 # MIS-545-Project
-### Predicing Outcomes of Formula 1 Races
+### Predicting Outcomes of Formula 1 Races
 
 
 
