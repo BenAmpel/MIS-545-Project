@@ -7,7 +7,8 @@
 # Description:
   # This script cleans F1 data downloaded from Kaggle
   # Files are arranged in alphabetical order
-# Source Data Files Descriptions:
+  # Some sections contain file-specific notes
+# Source Data Descriptions:
   # circuits: circuit name, location, and wiki page url
   # constructorResults: aggregated constructor points earned per race
   # constructors: constructor name, nationality, and wiki page url
