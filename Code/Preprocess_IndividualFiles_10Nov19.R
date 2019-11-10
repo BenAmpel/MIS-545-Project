@@ -5,34 +5,40 @@
 ## Author: Tyler Campbell
 ## Date: Nov 2019
 
-## IMPORTANT: If running full script (and not wanting to overwrite files), avoid 'Write files' section at bottom
+## IMPORTANT:
+  # If running full script (and not wanting to overwrite files), avoid 'Write files' section at bottom
 
 ## Description:
   # This R script performs cleaning of individual raw F1 source data files
   # Sections are arranged in alphabetical order and contain section-specific notes
-  # A separate script will be created for binding the data frames
-  
-## Source Dataset Descriptions:
-  # circuits: circuit name, location, and wiki page url
-  # constructorResults: aggregated constructor points earned per race
-  # constructors: constructor name, nationality, and wiki page url
-  # constructorStandings: running/accumulated 'points' and 'wins' for constructors in a given season
-  # drivers: driver name, number, dob, nationality, and wiki page url
-  # driverStandings: accumulated driver points and wins for a given season
-  # lapTimes: lap time and position for each driver in each lap of each race
-  # pitStops: stop number and stop duration/milliseconds of each pitstop at a given time of day on a given lap by a given driver
-  # qualifying: qualifying times (and final qualifying position) for each driver of each race
-  # races: race name, date, and time for each seasons, and wiki page url
-  # *results*: results of every race (*critical file containing dependent variables*)
-  # seasons: year and wiki page url of each season
-  # status: key and description of race results (e.g. finished, +1 Lap, collision, etc.)
+  # A separate script will be created for joining the data frames
 
 ##################################################################################################
 
 
 
 
-##### Load packages ####
+#### Source Dataset Help ####
+
+# circuits: circuit name, location, and wiki page url
+# constructorResults: aggregated constructor points earned per race
+# constructors: constructor name, nationality, and wiki page url
+# constructorStandings: running/accumulated 'points' and 'wins' for constructors in a given season
+# drivers: driver name, number, dob, nationality, and wiki page url
+# driverStandings: accumulated driver points and wins for a given season
+# lapTimes: lap time and position for each driver in each lap of each race
+# pitStops: stop number and stop duration/milliseconds of each pitstop at a given time of day on a given lap by a given driver
+# qualifying: qualifying times (and final qualifying position) for each driver of each race
+# races: race name, date, and time for each seasons, and wiki page url
+# *results*: results of every race (*critical file containing dependent variables*)
+# seasons: year and wiki page url of each season
+# status: key and description of race results (e.g. finished, +1 Lap, collision, etc.)
+
+
+
+
+#### Load packages ####
+
 install.packages("tidyverse")
 install.packages("chron")
 library(tidyverse)
@@ -456,18 +462,18 @@ colnames(status) [colnames(status) == "status"] <- "status_description"
 path_out <- "./Processed Data"
 
 # write to csvs
-write.csv(circuits, file.path(path_out, "circuits_clean.csv"), row.names=FALSE)
-write.csv(constructorResults, file.path(path_out, "constructorResults_clean.csv"), row.names=FALSE)
-write.csv(constructors, file.path(path_out, "constructors_clean.csv"), row.names=FALSE)
-write.csv(constructorStandings, file.path(path_out, "constructorStandings_clean.csv"), row.names=FALSE)
-write.csv(drivers, file.path(path_out, "drivers_clean.csv"), row.names=FALSE)
-write.csv(driverStandings, file.path(path_out, "driverStandings_clean.csv"), row.names=FALSE)
-write.csv(lapTimes, file.path(path_out, "lapTimes_clean.csv"), row.names=FALSE)
-write.csv(pitStops, file.path(path_out, "pitStops_clean.csv"), row.names=FALSE)
-write.csv(qualifying, file.path(path_out, "qualifying_clean.csv"), row.names=FALSE)
-write.csv(races, file.path(path_out, "races_clean.csv"), row.names=FALSE)
-write.csv(results, file.path(path_out, "results_clean.csv"), row.names=FALSE)
-write.csv(seasons, file.path(path_out, "seasons_clean.csv"), row.names=FALSE)
-write.csv(status, file.path(path_out, "status_clean.csv"), row.names=FALSE)
+write.csv(circuits, file.path(path_out, "circuits_clean.csv"), row.names = F)
+write.csv(constructorResults, file.path(path_out, "constructorResults_clean.csv"), row.names = F)
+write.csv(constructors, file.path(path_out, "constructors_clean.csv"), row.names = F)
+write.csv(constructorStandings, file.path(path_out, "constructorStandings_clean.csv"), row.names = F)
+write.csv(drivers, file.path(path_out, "drivers_clean.csv"), row.names = F)
+write.csv(driverStandings, file.path(path_out, "driverStandings_clean.csv"), row.names = F)
+write.csv(lapTimes, file.path(path_out, "lapTimes_clean.csv"), row.names = F)
+write.csv(pitStops, file.path(path_out, "pitStops_clean.csv"), row.names = F)
+write.csv(qualifying, file.path(path_out, "qualifying_clean.csv"), row.names = F)
+write.csv(races, file.path(path_out, "races_clean.csv"), row.names = F)
+write.csv(results, file.path(path_out, "results_clean.csv"), row.names = F)
+write.csv(seasons, file.path(path_out, "seasons_clean.csv"), row.names = F)
+write.csv(status, file.path(path_out, "status_clean.csv"), row.names = F)
 
 

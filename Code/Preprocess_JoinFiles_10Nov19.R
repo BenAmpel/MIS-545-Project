@@ -1,17 +1,25 @@
 ##################################################################################################
 #### Introduction ####
 
-## Title: F1 Preprocessing - Bind Source Data
+## Title: F1 Preprocessing - Join Source Data
 ## Author: Tyler Campbell
 ## Date: Nov 2019
 
-## IMPORTANT: If running full script (and not wanting to overwrite files), avoid 'Write file' section at bottom
+## IMPORTANT:
+  # Run this script after running 'Preprocess_IndividualFiles_10Nov19'
+  # If running full script (and not wanting to overwrite files), avoid 'Write files' section at bottom
 
 ## Description:
-# This R script performs binding and cleaning of processed F1 source data
+# This R script performs joining and cleaning of processed F1 source data
 # Sections are arranged in alphabetical order and contain section-specific notes
 
-## Source Dataset Descriptions:
+##################################################################################################
+
+
+
+
+#### Source Dataset Descriptions ####
+
 # circuits: circuit name, location, and wiki page url
 # constructorResults: aggregated constructor points earned per race
 # constructors: constructor name, nationality, and wiki page url
@@ -25,5 +33,3 @@
 # *results*: results of every race (*critical file containing dependent variables*)
 # seasons: year and wiki page url of each season
 # status: key and description of race results (e.g. finished, +1 Lap, collision, etc.)
-
-##################################################################################################

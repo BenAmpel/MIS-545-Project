@@ -1,0 +1,11 @@
+---
+title: "README_Analyzed Data"
+author: "Tyler Campbell"
+date: "11/10/2019"
+output: html_document
+---
+
+\
+**This folder contains data input for models.**
+\
+\
