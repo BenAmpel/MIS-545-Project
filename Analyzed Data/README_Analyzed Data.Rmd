@@ -6,6 +6,6 @@ output: html_document
 ---
 
 \
-**This folder contains data input for models.**
+**This folder contains data input used in models.**
 \
 \
