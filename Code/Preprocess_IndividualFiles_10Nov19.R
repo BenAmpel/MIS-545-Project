@@ -8,10 +8,8 @@
 ## IMPORTANT: If running full script (and not wanting to overwrite files), avoid 'Write files' section at bottom
 
 ## Description:
-  # This R script performs cleaning of individual raw F1 source files
-  # Sections are arranged in alphabetical order
-  # Some sections contain file-specific notes
-  # After running full script, ignore warnings: '7 failed to parse' and 'NAs introduced by coercion'
+  # This R script performs cleaning of individual raw F1 source data files
+  # Sections are arranged in alphabetical order and contain section-specific notes
   # A separate script will be created for binding the data frames
   
 ## Source Dataset Descriptions:
