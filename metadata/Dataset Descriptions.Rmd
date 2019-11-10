@@ -1,12 +1,12 @@
 ---
-title: "README_Processed Data"
+title: "Dataset Descriptions"
 author: "Tyler Campbell"
 date: "11/10/2019"
 output: html_document
 ---
 
 \
-**This folder contains cleaned/processed data.**
+**This file contains descriptions and processing considerations for source data.**
 \
 \
 
