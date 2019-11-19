@@ -23,6 +23,7 @@ output: html_document
 * **constructorStandings:** running/accumulated 'points' and 'wins' for constructors in a given season
 
 * **drivers:** every driver name, number, dob, nationality, and wiki page url
+  + create feature that contains driver age at time of race
 
 * **driverStandings:** accumulated driver points and wins for a given season
   + thought: if you could associate a race with its round #, then driver with most points after final round wins championship

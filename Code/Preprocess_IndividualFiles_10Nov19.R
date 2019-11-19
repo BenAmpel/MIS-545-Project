@@ -35,7 +35,8 @@
 # status: key and description of race results (e.g. finished, +1 Lap, collision, etc.)
 
 
-
+install.packages('tinytex')
+library(tinytex)
 
 #### Load packages ####
 
@@ -181,7 +182,7 @@ drivers$dob <- ymd(drivers$dob)
 
 # rename columns
 drivers <- drivers %>%
-  rename("driver_Name" = "driverRef",
+  rename("driver_name" = "driverRef",
          "driver_dob" = "dob",
          "driver_nationality" = "nationality",
          "driver_url" = "url"
@@ -380,7 +381,7 @@ colSums(results == "" | results == "NULL" | is.na(results))
 results <- subset(results, select = -c(position, number, time))
 
 # convert positionText column to finish description
-results <- mutate(results, results_finishDescription = 
+results <- mutate(results, result_finishDescription = 
                   ifelse(results$positionText == "D", "Disqualified",
                   ifelse(results$positionText == "E", "Excluded",
                   ifelse(results$positionText == "F", "FailedToFinish",
@@ -459,21 +460,21 @@ colnames(status) [colnames(status) == "status"] <- "status_description"
 #### Write files ####
 
 # define output path
-path_out <- "./Processed Data"
+path_out1 <- "./Processed Data"
 
 # write to csvs
-write.csv(circuits, file.path(path_out, "circuits_clean.csv"), row.names = F)
-write.csv(constructorResults, file.path(path_out, "constructorResults_clean.csv"), row.names = F)
-write.csv(constructors, file.path(path_out, "constructors_clean.csv"), row.names = F)
-write.csv(constructorStandings, file.path(path_out, "constructorStandings_clean.csv"), row.names = F)
-write.csv(drivers, file.path(path_out, "drivers_clean.csv"), row.names = F)
-write.csv(driverStandings, file.path(path_out, "driverStandings_clean.csv"), row.names = F)
-write.csv(lapTimes, file.path(path_out, "lapTimes_clean.csv"), row.names = F)
-write.csv(pitStops, file.path(path_out, "pitStops_clean.csv"), row.names = F)
-write.csv(qualifying, file.path(path_out, "qualifying_clean.csv"), row.names = F)
-write.csv(races, file.path(path_out, "races_clean.csv"), row.names = F)
-write.csv(results, file.path(path_out, "results_clean.csv"), row.names = F)
-write.csv(seasons, file.path(path_out, "seasons_clean.csv"), row.names = F)
-write.csv(status, file.path(path_out, "status_clean.csv"), row.names = F)
+write.csv(circuits, file.path(path_out1, "circuits_clean.csv"), row.names = F)
+write.csv(constructorResults, file.path(path_out1, "constructorResults_clean.csv"), row.names = F)
+write.csv(constructors, file.path(path_out1, "constructors_clean.csv"), row.names = F)
+write.csv(constructorStandings, file.path(path_out1, "constructorStandings_clean.csv"), row.names = F)
+write.csv(drivers, file.path(path_out1, "drivers_clean.csv"), row.names = F)
+write.csv(driverStandings, file.path(path_out1, "driverStandings_clean.csv"), row.names = F)
+write.csv(lapTimes, file.path(path_out1, "lapTimes_clean.csv"), row.names = F)
+write.csv(pitStops, file.path(path_out1, "pitStops_clean.csv"), row.names = F)
+write.csv(qualifying, file.path(path_out1, "qualifying_clean.csv"), row.names = F)
+write.csv(races, file.path(path_out1, "races_clean.csv"), row.names = F)
+write.csv(results, file.path(path_out1, "results_clean.csv"), row.names = F)
+write.csv(seasons, file.path(path_out1, "seasons_clean.csv"), row.names = F)
+write.csv(status, file.path(path_out1, "status_clean.csv"), row.names = F)
 
 
