@@ -10,29 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Problem description and the current state of the domain
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## R Markdown
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
-## Problem description and the current state of the domain
 Describe the problem that your team is working on and how this individual assignment fits.Explain what your focus is, and how it differs from the team project. For example: integratingdifferent   data   sets,   trying   new   algorithms,   ...   Team   members   cannot   submit   the   samealgorithms on same data sets. In other words, your work is supposed to differ from that ofother team member EITHER in term of algorithm OR dataset.
 
-## Data set description: origin, data points, variable
+## Data set description: origin, data points, variables
 
 Your data set should contain minimally 5,000 data points after preprocessing. Describe itsorigin, the number of variables (minimally 5), and descriptive statistics for your data (e.g.,mean, standard deviation, min, max, etc.)
 
