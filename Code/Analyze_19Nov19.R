@@ -19,14 +19,8 @@
 
 #### Load packages ####
 
-install.packages("ggplot2")
-install.packages("animation")
-install.packages("fpc")
-install.packages("randomForest")
-install.packages("corrplot")
 library(dplyr)
 library(VIM)
-
 library(ggplot2)
 library(animation)
 library(randomForest)

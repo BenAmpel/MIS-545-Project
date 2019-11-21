@@ -39,8 +39,6 @@
 
 #### Load packages ####
 
-install.packages("tidyverse")
-install.packages("chron")
 library(tidyverse)
 library(lubridate)
 library(chron)
