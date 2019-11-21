@@ -1,4 +1,5 @@
-##################################################################################################
+#############################################################################
+
 #### Introduction ####
 
 ## Title: F1 Preprocessing - Join Source Data
@@ -16,26 +17,17 @@
   # 'Historical' - maximizes results back to 1950, but excludes newer measures such as fastest lap data
   # 'Modern' - includes newer measures, but excludes records before 2011
 
-##################################################################################################
+#############################################################################
 
 
 
 
-#### Source Dataset Descriptions ####
+#### Markdown ####
 
-# circuits: circuit name, location, and wiki page url
-# constructorResults: aggregated constructor points earned per race
-# constructors: constructor name, nationality, and wiki page url
-# constructorStandings: running/accumulated 'points' and 'wins' for constructors in a given season
-# drivers: driver name, number, dob, nationality, and wiki page url
-# driverStandings: accumulated driver points and wins for a given season
-# lapTimes: lap time and position for each driver in each lap of each race
-# pitStops: stop number and stop duration/milliseconds of each pitstop at a given time of day on a given lap by a given driver
-# qualifying: qualifying times (and final qualifying position) for each driver of each race
-# races: race name, date, and time for each seasons, and wiki page url
-# *results*: results of every race (*critical file containing dependent variables*)
-# seasons: year and wiki page url of each season
-# status: key and description of race results (e.g. finished, +1 Lap, collision, etc.)
+# ignore this section for normal processing
+# load blank workspace when compiling/knitting
+# extra dots also are added to file paths for compilation purposes, remove when running script
+# load("../metadata/workSpace_JoinFiles.RData")
 
 
 
@@ -43,13 +35,16 @@
 #### Load packages ####
 
 library(tidyverse)
+library(lubridate)
+library(chron)
 
 
 
 
 #### Join Data Frames ####
 
-## Historical -------------------------------------------------------------------------------
+## Historical ---------------------------------------------------------------
+
 
 # This join focuses on maximizing historical data at the expense of newer measures such as pitStops and lapTimes
   # (i.e. excludes data such as pitStop times which are only recorded beginning in 2011)

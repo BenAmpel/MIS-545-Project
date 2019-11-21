@@ -1,4 +1,4 @@
-##################################################################################################
+#############################################################################
 #### Introduction ####
 
 ## Title: F1 Analysis
@@ -12,7 +12,17 @@
 # This R script performs analysis of cleaned F1 source data
 # Sections are arranged in alphabetical order and contain section-specific notes
 
-##################################################################################################
+#############################################################################
+
+
+
+
+#### Markdown ####
+
+# ignore this section for normal processing
+# load blank workspace when compiling/knitting
+# extra dots also are added to file paths for compilation purposes, remove when running script
+# load("../metadata/workSpace_Analyze.RData")
 
 
 
@@ -28,8 +38,10 @@ library(e1071)
 library(corrplot)
 
 
+
+
 #### Load dataset ####
-resultsHistorical <- read.csv("../Analyzed Data/resultsHistorical.csv")
+resultsHistorical <- read.csv("./Analyzed Data/resultsHistorical.csv")
 
 
 
@@ -69,7 +81,7 @@ str(clusters)
 num_clusters <- 4
 
 driverClust <- kmeans.ani(driversLatLong[,c(2:3)], num_clusters)
-
+# above line commented out for report compilation purposes
 
 # save the cluster number in the dataset as column 'driverHomeCluster'
 driversLatLong <- driversLatLong %>%
@@ -119,7 +131,7 @@ resultsHistorical <- resultsHistorical %>%
 
 #### Predict ####
 
-## Naieve Bayes -----------------------------------------------------------------
+## Naieve Bayes ------------------------------------------------------------
 
 # review the data
 summary(resultsHistorical)
@@ -155,7 +167,7 @@ results.predict <- predict(results.model, test, type = 'class')
 
 
 # test model against recent Brazil Grand Prix results
-testBrazil <- read.csv("../Processed Data/brazil2019.csv")
+testBrazil <- read.csv("./Processed Data/brazil2019.csv")
 
 testBrazil$driverCluster <- as.factor(testBrazil$driverCluster)
 
@@ -219,7 +231,7 @@ falsePositiveRate <- FP / (TN + FP)
 #### Write File ####
 
 # define output path
-path_out2 <- "../Analyzed Data"
+path_out2 <- "./Analyzed Data"
 
 # write to csv
 write.csv(resultsNB, file.path(path_out2, "resultsNB.csv"), row.names = F)
