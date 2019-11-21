@@ -169,16 +169,13 @@ results.predict <- predict(results.model, test, type = 'class')
 # test model against recent Brazil Grand Prix results
 testBrazil <- read.csv("./Processed Data/brazil2019.csv")
 
+# factorize driverCluster dimension
 testBrazil$driverCluster <- as.factor(testBrazil$driverCluster)
 
 results.predict2 <- predict(results.model, testBrazil, type = 'class')
 
-resultsNB_output2 <- data.frame(actual = testBrazil[,'result_inThePoints'], predicted = results.predict2)
+resultsNB_output2 <- data.frame(driver_name = testBrazil[,'driver_name'], predicted = results.predict2, actual = testBrazil[,'result_inThePoints'])
 
-table(resultsNB_output2)
-
-# accuracy = .65
-# conditional accuracy = .5
 
 
 
@@ -214,11 +211,20 @@ precision <- TP / (TP + FP)
 falsePositiveRate <- FP / (TN + FP)
 
 
+# inspect results of 2019 Brazilian Grand Prix
+resultsNB_output2
+
+table(resultsNB_output2[,c(2,3)])
+
+# accuracy = .65
+# baseline accuracy = .5
+
+
 ## Results -----------------------------------------------------------------
 
 # error rate = .2203
 # model accuracy = .7797
-  # conditional accuracy = .7169
+  # baseline accuracy = .7169
   # accuracy improvement = .0628
 # sensitivity (true positive) = .5576
 # specificity (true negative) = .8662

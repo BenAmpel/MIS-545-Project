@@ -1,0 +1,53 @@
+---
+title: "Predicting Race Outcomes in Formula 1"
+author: "Tyler Campbell"
+date: "11/20/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem description and the current state of the domain
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## R Markdown
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Problem description and the current state of the domain
+Describe the problem that your team is working on and how this individual assignment fits.Explain what your focus is, and how it differs from the team project. For example: integratingdifferent   data   sets,   trying   new   algorithms,   ...   Team   members   cannot   submit   the   samealgorithms on same data sets. In other words, your work is supposed to differ from that ofother team member EITHER in term of algorithm OR dataset.
+
+## Data set description: origin, data points, variable
+
+Your data set should contain minimally 5,000 data points after preprocessing. Describe itsorigin, the number of variables (minimally 5), and descriptive statistics for your data (e.g.,mean, standard deviation, min, max, etc.)
+
+## Data preprocessing activities and results
+
+Describe your data preprocessing activities. Describe the transformations you made, the rationale behind it and the results with descriptive statistics.
+
+## Intended algorithms to be used and rationale
+
+Describe your data mining approach. Which algorithms do you use, with which variables and why.
+
+## Execution
+
+Execute your data mining project and describe the results in detail. 
+
+## Conclusion/reflection
+
+Reflect on your results and describe how they help your team project. If your results were ‘notgood’, explain how the lessons learned help your team
