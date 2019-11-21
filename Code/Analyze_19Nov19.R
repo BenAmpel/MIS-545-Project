@@ -29,7 +29,7 @@ library(corrplot)
 
 
 #### Load dataset ####
-resultsHistorical <- read.csv("./Analyzed Data/resultsHistorical.csv")
+resultsHistorical <- read.csv("../Analyzed Data/resultsHistorical.csv")
 
 
 
@@ -155,7 +155,7 @@ results.predict <- predict(results.model, test, type = 'class')
 
 
 # test model against recent Brazil Grand Prix results
-testBrazil <- read.csv("./Processed Data/brazil2019.csv")
+testBrazil <- read.csv("../Processed Data/brazil2019.csv")
 
 testBrazil$driverCluster <- as.factor(testBrazil$driverCluster)
 
@@ -219,7 +219,7 @@ falsePositiveRate <- FP / (TN + FP)
 #### Write File ####
 
 # define output path
-path_out2 <- "./Analyzed Data"
+path_out2 <- "../Analyzed Data"
 
 # write to csv
 write.csv(resultsNB, file.path(path_out2, "resultsNB.csv"), row.names = F)
