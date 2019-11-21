@@ -54,16 +54,9 @@ aggr(drivers)
 # partition the data
 driversLatLong <- drivers[,c(2, 6:7)]
 
-# conert driver name to factor
+
+# convert driver name to factor
 driversLatLong$driver_name <- as.factor(driversLatLong$driver_name)
-
-# standardize variables
-
-# normalize the data - not necessary for coordinates
-#driversLatLong <- driversLatLong %>%
- # mutate(lat = scale(driver_lat),
-         # long = scale(driver_long)) %>%
-  #select(-c(driver_lat, driver_long))
 
 
 # set seed for randmozing data
@@ -95,6 +88,7 @@ kmeans.totwithinss.k <- function(dataset, number_of_centers){
   km <- kmeans(dataset, number_of_centers)
   km$tot.withinss
   }
+
 
 # create a function that returns a series of totwithinss values, and takes input maxk
 # vec is a vector that contains totwithinss values associated with k from 1 to maxk
@@ -142,6 +136,7 @@ resultsNB <- subset(resultsHistorical, select = -c(
   result_finishOrder,driver_lat, driver_long, constructor_lat, constructor_long)
   )
 
+
 # partition data for training and testing
 sample_size <- floor(0.7 * nrow(resultsNB))
 
@@ -164,31 +159,24 @@ results.model
 # test model
 results.predict <- predict(results.model, test, type = 'class')
 
-# review performance
-resultsNB_output <- data.frame(actual = test[,'result_inThePoints'], predicted = results.predict)
 
-table(resultsNB_output)
+# test model against recent Brazil Grand Prix results
+testBrazil <- read.csv("./Processed Data/brazil2019.csv")
 
-TP <- 1161
-FP <- 715
-TN <- 4629
-FN <- 921
+testBrazil$driverCluster <- as.factor(testBrazil$driverCluster)
 
-# error rate = .2203
-(FP + FN) / (TP + FP + TN + FN)
-# model accuracy = .7797
-(TP + TN) / (TP + FP + TN + FN)
-  # conditional accuracy = .7169
-  # accuracy improvement = .0628
-# sensitivity = .5576
-TP / (TP + FN)
-# specificity = .8662
-TN / (TN + FP)
-# precision = .6189
-TP / (TP + FP)
-# false positive rate = .1338
-FP / (TN + FP)
+results.predict2 <- predict(results.model, testBrazil, type = 'class')
 
+resultsNB_output2 <- data.frame(actual = testBrazil[,'result_inThePoints'], predicted = results.predict2)
+
+table(resultsNB_output2)
+
+# accuracy = .65
+# conditional accuracy = .5
+
+
+
+#### Analyze results ####
 
 # inspect correlation of variables, which could impact model (i.e. assumed independence)
 train %>%
@@ -196,3 +184,48 @@ train %>%
   select_if(is.numeric) %>%
   cor() %>%
   corrplot::corrplot()
+
+
+# create confusion matrix
+resultsNB_output <- data.frame(actual = test[,'result_inThePoints'], predicted = results.predict)
+
+table(resultsNB_output)
+
+
+# assign 'True Positive', 'False Positive', 'True Negative', 'False Negative'
+TP <- 1161
+FP <- 715
+TN <- 4629
+FN <- 921
+
+
+# calculate evaluation metrics
+errorRate <- (FP + FN) / (TP + FP + TN + FN)
+accuracy <- (TP + TN) / (TP + FP + TN + FN)
+sensitivity <- TP / (TP + FN)
+specificity <- TN / (TN + FP)
+precision <- TP / (TP + FP)
+falsePositiveRate <- FP / (TN + FP)
+
+
+## Results -----------------------------------------------------------------
+
+# error rate = .2203
+# model accuracy = .7797
+  # conditional accuracy = .7169
+  # accuracy improvement = .0628
+# sensitivity (true positive) = .5576
+# specificity (true negative) = .8662
+# precision = .6189
+# false positive rate = .1338
+
+
+
+
+#### Write File ####
+
+# define output path
+path_out2 <- "./Analyzed Data"
+
+# write to csv
+write.csv(resultsNB, file.path(path_out2, "resultsNB.csv"), row.names = F)
