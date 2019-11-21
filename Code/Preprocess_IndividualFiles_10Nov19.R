@@ -35,8 +35,7 @@
 # status: key and description of race results (e.g. finished, +1 Lap, collision, etc.)
 
 
-install.packages('tinytex')
-library(tinytex)
+
 
 #### Load packages ####
 
