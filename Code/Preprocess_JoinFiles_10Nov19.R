@@ -8,7 +8,7 @@
 
 ## IMPORTANT:
   # Run this script after running 'Preprocess_IndividualFiles_10Nov19'
-  # If running full script (and not wanting to overwrite files), avoid 'Write files' section at bottom
+  # If running full script, include 'Write files' section at bottom before advancing to 'Analyze_19Nov19'
 
 ## Description:
 # This R script performs joining and cleaning of processed F1 source data
