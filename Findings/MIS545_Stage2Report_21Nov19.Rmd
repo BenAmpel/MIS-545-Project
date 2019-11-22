@@ -9,25 +9,186 @@ output: word_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Problem description and the current state of the domain
-Describe the problem that your team is working on and how this individual assignment fits.Explain what your focus is, and how it differs from the team project. For example: integratingdifferent   data   sets,   trying   new   algorithms,   ...   Team   members   cannot   submit   the   samealgorithms on same data sets. In other words, your work is supposed to differ from that ofother team member EITHER in term of algorithm OR dataset.
+<br>
 
-## Data set description: origin, data points, variables
+## Project Introduction
 
-Your data set should contain minimally 5,000 data points after preprocessing. Describe itsorigin, the number of variables (minimally 5), and descriptive statistics for your data (e.g.,mean, standard deviation, min, max, etc.)
+My name is Tyler Campbell and I am a Master's in MIS student at The University of Arizona, class of Dec '19. Apart from being a student, I am an aspring Data Scientist and avid Formula 1 fan.
+
+This report contains my individual work from Stage 2 (of 3) as part of a team project in **MIS 545 - Data Mining for Business Intelligence**, taught by Dr. Bin Zhang.
+
+The requirements of this stage are for team members to independently test a different data subset or algorithm, or to try a different approach altogether (as compared to Stage 1). In Stage 3, the team will regroup and build off eachother's analysis.
+
+## Problem Description
+
+Apart from the extreme financial demands of the sport, one of the great challenges in F1 is for team principals and strategists to decide which of their two drivers to prioritize in a race. Sometimes there is a clear cut difference over which driver is faster (thus deserving preferential treatment) and other times there is not. Being able to better predict race outcomes would allow for more effective team strategizing.
+
+## Team vs Individual Approaches
+
+In Stage 1 of the project, the team set out to predict order of podium finishers (i.e. top 3) in a given race based off individual lap data from 2011 to 2017. We incorporated C5.0, SVM, and Naieve Bayes classifer algorithms. The findings produced fair accuracy, but their usefulness was limited due to only considering outcomes of 3 drivers and only building off data from a 6 year window. Having the granularity at lap times as opposed to race results also resulted in problematic redundancies.
+
+Given these shortfalls, for Stage 2 I chose to re-structure the dataset to include race results dating back to 1950 by selecting different features. The process required extensive cleaning, but ultimately allowed me to predict whether or not a racer would finish 'in the points' (i.e. top 10) or 'out of the points', which seemed like much more useful findings. Additionally, I incorporated K-means clustering and feature creation, all of which will be expanded on in the following sections.
+
+## Dataset Description
+
+Data for this project was obtained from Kaggle (<https://www.kaggle.com/cjgdev/formula-1-race-data-19502017>), originally sourced from Ergast Developer API (<https://ergast.com/mrd/>) at the conclusion of the 2017 season. Data on ergast is gathered and published to the public domain by Chris Newell.
+
+The raw data is comprised of the below 13 files (where code chunks represent dimensions and summary statistics). The 'laptimes' table is the largest, containing over 400,000 records. Due to my decision to set the grain to driver race outcomes (as opposed to lap times), the 'results' file dictated the overall number of observations at just under 30,000.
+
+```{r include=FALSE}
+#### Load packages ####
+
+library(tidyverse)
+library(lubridate)
+library(chron)
+```
+
+
+```{r include=FALSE}
+#### Load files ####
+
+# define input path
+path_in <- "../Raw Source Data"
+
+# read files
+circuits <- read.csv(file.path(path_in, "circuits.csv"), stringsAsFactors = F)
+constructorResults <- read.csv(file.path(path_in, "constructorResults.csv"), stringsAsFactors = F)
+constructors <- read.csv(file.path(path_in, "constructors.csv"), stringsAsFactors = F)
+constructorStandings <- read.csv(file.path(path_in, "constructorStandings.csv"), stringsAsFactors = F)
+drivers <- read.csv(file.path(path_in, "drivers.csv"), stringsAsFactors = F)
+driverStandings <- read.csv(file.path(path_in, "driverStandings.csv"), stringsAsFactors = F)
+lapTimes <- read.csv(file.path(path_in, "lapTimes.csv"), stringsAsFactors = F)
+pitStops <- read.csv(file.path(path_in, "pitStops.csv"), stringsAsFactors = F)
+qualifying <- read.csv(file.path(path_in, "qualifying.csv"), stringsAsFactors = F, skipNul = TRUE, na.strings = c("","NULL","NA")) # also convert embedded NULLs and blanks to NA))
+races <- read.csv(file.path(path_in, "races.csv"), stringsAsFactors = F, skipNul = TRUE, na.strings = c("","NULL","NA")) # also convert embedded NULLs and blanks to NA))
+results <- read.csv(file.path(path_in, "results.csv"), stringsAsFactors = F, na.strings = c("","NULL","NA")) # also convert embedded NULLs and blanks to NA))
+seasons <- read.csv(file.path(path_in, "seasons.csv"), stringsAsFactors = F)
+status <- read.csv(file.path(path_in, "status.csv"), stringsAsFactors = F)
+```
+
+
+**circuits:** every circuit name, location, and wiki page url
+
+```{r echo=FALSE}
+dim(circuits)
+summary(circuits)
+```
+
+
+**constructorResults:** aggregated constructor points earned per race
+```{r echo=FALSE}
+dim(constructorResults)
+summary(constructorResults)
+```
+  + 'D' in 'status' column represents 'Disqualified' due to Spygate scandal in 2007 season (https://en.wikipedia.org/wiki/2007_Formula_One_espionage_controversy)
+  
+**constructors:** every constructor name, nationality, and wiki page url
+```{r echo=FALSE}
+dim(constructors)
+summary(constructors)
+```
+  + constructors are teams (e.g. Ferrari, Williams, Red Bull, etc.)
+  + in modern racing era there are 10 constructors with 2 drivers each
+
+**constructorStandings:** running/accumulated 'points' and 'wins' for constructors in a given season
+```{r echo=FALSE}
+dim(constructorStandings)
+summary(constructorStandings)
+```
+
+**drivers:** every driver name, number, dob, nationality, and wiki page url
+```{r echo=FALSE}
+dim(drivers)
+summary(drivers)
+```
+  + create feature that contains driver age at time of race
+
+**driverStandings:** accumulated driver points and wins for a given season
+```{r echo=FALSE}
+dim(driverStandings)
+summary(driverStandings)
+```
+  + thought: if you could associate a race with its round #, then driver with most points after final round wins championship
+
+**lapTimes:** lap time and position for each driver in each lap of each race
+```{r echo=FALSE}
+dim(lapTimes)
+summary(lapTimes)
+```
+  + file is missing lap times from at least races 400-800 (by raceID)
+  + consider excluding lap 25 of raceId 847 (2011 Canadian Grand Prix had "torrential rains" that caused a single lap to clock in at over 2 hrs)
+  + consider excluding file altogether
+
+**pitStops:** stop number and stop duration/milliseconds of each pitstop at a given time of day on a given lap by a given driver
+```{r echo=FALSE}
+dim(pitStops)
+summary(pitStops)
+```
+  + file excludes races before 2011 and after 2017
+  + consider aggregating 'milliseconds' per driver per race to obtain a single total pit time per race
+  + consider obtaining largest number of 'stop' per driver per race to get total number of pit stops per race
+  + consider excluding file altogether
+
+**qualifying:** qualifying times (and final qualifying position) for each driver of each race
+```{r echo=FALSE}
+dim(qualifying)
+summary(qualifying)
+```
+  + the process of qualifying determines grid position at start of race
+  + the slowest drivers (e.g. bottom 5) get knocked out after each round of qualifying
+  + 'position' should be the same as grid in results file
+  + consider excluding file altogether because of NAs
+
+**races:** race name, date, and time for each seasons, and wiki page url
+```{r echo=FALSE}
+dim(races)
+summary(races)
+```
+  + race time is empty from 1950 to 2005
+  + consider removing 'time'
+  + remove 'name' which will be redundant after merge (circuits table contains ref)
+
+**results:** results of every race (*critical file containing dependent variables*)
+```{r echo=FALSE}
+dim(results)
+summary(results)
+```
+  + 'time' is inconsistently represented as minutes:seconds beyond 1 hr for first place driver, then the gap for next several drivers
+  + no time is recorded for racers greater than 1 lap behind the winner
+  + consider just including 'time' for winner, otherwise it's reflected as "gap" and often +1 laps rather than a time
+  + 'position' = raceFinish, 'positionText' = raceFinish or descriptor of retired/disqualified etc., 'positionOrder' = raceFinish or order of retired/disqualified
+  + positionText: D=Disqualified, E=Excluded, F=Did Not (/failed to) Qualify, N=Not Classified, R=Retired, W=Withrew
+  + consider converting 'positionText' to boolean (i.e. Finished, Did not finish)
+  + fastest lap data is empty or NA from 1950 to 2004
+  + 'grid' is mostly a duplicate of position in qualifying table, but is likely more reliable
+
+**seasons:** year and wiki page url of each season
+```{r echo=FALSE}
+dim(seasons)
+summary(seasons)
+```
+  + somewhat irrelevant file unless wanting to scrape wiki pages
+
+**status:** key and description of race results (e.g. finished, +1 Lap, collision, etc.)
+```{r echo=FALSE}
+dim(status)
+summary(status)
+```
+
+
 
 ## Data preprocessing activities and results
 
-Describe your data preprocessing activities. Describe the transformations you made, the rationale behind it and the results with descriptive statistics.
+*Describe your data preprocessing activities. Describe the transformations you made, the rationale behind it and the results with descriptive statistics.*
 
 ## Intended algorithms to be used and rationale
 
-Describe your data mining approach. Which algorithms do you use, with which variables and why.
+*Describe your data mining approach. Which algorithms do you use, with which variables and why.*
 
 ## Execution
 
-Execute your data mining project and describe the results in detail. 
+*Execute your data mining project and describe the results in detail.*
 
 ## Conclusion/reflection
 
-Reflect on your results and describe how they help your team project. If your results were ‘notgood’, explain how the lessons learned help your team
+*Reflect on your results and describe how they help your team project. If your results were ‘notgood’, explain how the lessons learned help your team.*
