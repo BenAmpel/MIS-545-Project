@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Project Introduction
 
-This report contains findings and steps-taken during Stage 2 (of 3) of a team project in **MIS 545 - Data Mining for Business Intelligence**, taught by Dr. Bin Zhang at The University of Arizona.
+This report contains findings and steps-taken during Stage 2 (of 3) of a project in **MIS 545 - Data Mining for Business Intelligence**, taught by Dr. Bin Zhang at The University of Arizona.
 
 The requirements for this stage were for team members to independently test different data subsets or algorithms, or to try different approaches altogether (as compared to Stage 1). In Stage 3, the team will regroup and build off eachother's analyses.
 
@@ -467,7 +467,8 @@ write.csv(status, file.path(path_out1, "status_clean.csv"), row.names = F)
 ```
 
 
-### Files Merge and Additional Cleaning
+### Merge and Additional Cleaning
+
 ```{r}
 # read in country Codes
 countryCodes <- read.csv("../Raw Source Data/countryCodes.csv", stringsAsFactors = FALSE)
@@ -751,9 +752,21 @@ write.csv(resultsHistorical, file.path(path_out2, "resultsHistorical.csv"), row.
 ```
 
 
-## Intended algorithms to be used and rationale
+## Algorithms & Execution
 
-*Describe your data mining approach. Which algorithms do you use, with which variables and why.*
+### K-Means
+
+Once the data had been cleaned and consolidated, I wanted to check for hidden patterns in the dataset via clustering. I chose to test K-Means on driver home country (lat, long) because the sport is widely recognized to be biased towards European drivers and races. Could it be that drivers from a particular region are actually that much better?
+
+The process of determining the correct number of clusters (k) involved plotting an elbow curve to measure levels of distortion. On several passes however, the kmeans.ani() function failed to identify the provided number of clusters. It seemed most consistent (as well as most logical visually) at 4 clusters.
+
+### Naieve Bayes
+
+After running K-Means, I first assigned the results back to the dataset and proceeded to test Naieve Bayes, assigning the dependent variable as the binarized 'result_inThePoints' feature. I kept most of the columns to use as predictors with the exception of lat, long fields which were now represented categorically in the results of the clutering. I also removed 'driver_finishOrder' which had been retained as an alternate dependent variable (factor with ~ 25 levels).
+
+The decision to perform Naieve Bayes over other algorithms like Random Forest or Support Vector Machine was somewhat through process of elimination. For example, Random Forest can not handle factors of over ~50 levels, which would've meant more cleaning (e.g. # of circuits is over 70). Meanwhile, SVM did not appeal due its known slow processing speed. On first attempt with Naieve Bayes, I obtained very reasonable results so I did not continue to explore other classifiers.
+
+Once the model was tested and confirmed improvement over baseline, I decided to test it on results from a race that took place just last weekend, the 2019 Brazilian Grand Prix. This required translating results data (via Ergast Developer API) into the appropriate format required for the model.
 
 ```{r include=FALSE}
 #### Load packages ####
@@ -895,9 +908,19 @@ resultsNB_output2 <- data.frame(driver_name = testBrazil[,'driver_name'], predic
 ```
 
 
-## Execution
+## Results
 
-*Execute your data mining project and describe the results in detail.*
+### K-Means
+
+Unfortunately the results from K-Means were somewhat underwhelming. In essence, all that happened is that drivers were clustered according to continents. Obviously this data could have been easily supplemented without the use of an advanced algorithm. Nvertheless, it was still interesting to view the distribution on an animated plot chart.
+
+### Naieve Bayes
+
+Results from Naieve Bayes were more interesting and encouraging. The model acheived an accuracy of 77.97%, which is an improvement of 6.28% from baseline. The specificity rate was also quite impressive at 86.62%, however it is somewhat understandable given that racers in the early years of F1 would often compete in qualifying and then not actually race (thus resulting in a high FALSE rate, ie. 'Not in the points').
+
+Results when tested against the 2019 Brazilian Grand Prix outcomes were very encouraging, producing an accuracy of 65% (a 15% improvement over baseline). The reason the baseline is higher in this scenario is because now it is always the case that 10 out of 20 drivers finish in the points (i.e. 50% conditional probability). Whereas in the past, points were allocated differently and the number of drivers in the field varied.
+
+Additional evaluation metrics are listed below in the code chunk.
 
 ```{r}
 #### Analyze results ####
@@ -964,4 +987,8 @@ write.csv(resultsNB, file.path(path_out2, "resultsNB.csv"), row.names = F)
 
 ## Conclusion/reflection
 
-*Reflect on your results and describe how they help your team project. If your results were ‘notgood’, explain how the lessons learned help your team.*
+Results from this analysis will undoubtedly help the team going forward. If nothing else, the dataset is now much more robust and easier to work with. It will provide a good platform for testing more advanced deep learning algorithms that may require more structured data.
+
+Apart from this advancement, I was very pleased at how well the model performed when tested against auxillary data (i.e. 2019 Grand Prix results). Being able to succesfully predict with 65% accuracy whether or not a driver will finish better than 10 out of 20 is not bad! It is especially impressive considering the model actually chose more than 10 drivers to finish in the points which is no longer relevant. Perhaps the next improvement can be to limit the model to predict only a certain number of 'points finishers' depending on the race season in question.
+
+Regardless, I really enjoyed this project and look forward to testing the model on the race next weekend in Abu Dhabi!
