@@ -2,9 +2,7 @@
 title: "Predicting Race Outcomes in Formula 1"
 author: "Tyler Campbell"
 date: "11/20/2019"
-output:
-  word_document: default
-  pdf_document: default
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -13,25 +11,28 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Project Introduction
 
-This report contains findings and highlights steps taken during Stage 2 (of 3) of a team project in **MIS 545 - Data Mining for Business Intelligence**, taught by Dr. Bin Zhang.
+This report contains findings and steps-taken during Stage 2 (of 3) of a team project in **MIS 545 - Data Mining for Business Intelligence**, taught by Dr. Bin Zhang at The University of Arizona.
 
-The requirements of this stage are for team members to independently test different data subsets or algorithms, or to try a different approach altogether (as compared to Stage 1). In Stage 3, the team will regroup and build off eachother's analysis.
+The requirements for this stage were for team members to independently test different data subsets or algorithms, or to try different approaches altogether (as compared to Stage 1). In Stage 3, the team will regroup and build off eachother's analyses.
 
 ## Problem Description
 
-Apart from the extreme financial demands of the sport, one of the great challenges in F1 is for team principals and strategists to decide which of their two drivers to prioritize in a race. Sometimes there is a clear cut difference over which driver is faster (thus deserving preferential treatment) and other times there is not. Being able to better predict race outcomes would allow for more effective team strategizing.
+Apart from the extreme financial demands of Formula 1, one of the great challenges of the sport is for team principals and strategists to decide which of their two drivers to prioritize in a race. Sometimes it is obvious which driver is faster (thus deserving preferential treatment) and other times it is not (which often leads to conflict). Being able to better predict race outcomes would allow for more effective team strategizing.
 
-## Team vs Individual Approaches
+## Team vs Individual Approach
 
-In Stage 1 of the project, the team set out to predict order of podium finishers (i.e. top 3) in a given race based off individual lap data from 2011 to 2017. We incorporated C5.0, SVM, and Naieve Bayes classifer algorithms. The findings produced fair accuracy, but their usefulness was limited due to only considering outcomes of 3 drivers and only building off data from a 6 year window. Having the granularity at lap times as opposed to race results also resulted in problematic redundancies.
+In Stage 1 of the project, the team set out to predict order of podium finishers (i.e. top 3) in a given race based off of individual lap data from 2011 to 2017. We incorporated C5.0, SVM, and Naieve Bayes classifer algorithms. The findings produced fair accuracies, but their usefulness was limited due to only considering outcomes of 3 drivers and only building off data from a 6 year window. Having the granularity of lap times as opposed to race results also resulted in problematic redundancies.
 
-Given these shortfalls, for Stage 2 I chose to re-structure the dataset to include race results dating back to 1950 by selecting different features. The process required extensive cleaning, but ultimately allowed me to predict whether or not a racer would finish 'in the points' (i.e. top 10) or 'out of the points', which seemed like much more useful findings. Additionally, I incorporated K-means clustering and feature creation, all of which will be expanded on in the following sections.
+Given these shortfalls, for Stage 2 I chose to re-structure the dataset to include race results of all drivers dating back to 1950. The process required extensive cleaning, but ultimately allowed me to predict whether or not a racer would finish 'in the points' (i.e. top 10) or 'out of the points', which seemed like a more useful finding. Once the cleaning had been performed, I went back and incorporated an additional dataset to obtain driver home town geocordinates. In the end, the algorithms that I tested were as follows:
 
-## Dataset Description
+* **K-Means** - on where drivers are from geographicaly (values were assigned back to the dataset) 
+* **Naieve Bayes** - to predict whether or not a racer finished 'in the points'
 
-Data for this project was obtained from Kaggle (<https://www.kaggle.com/cjgdev/formula-1-race-data-19502017>), originally sourced from Ergast Developer API (<https://ergast.com/mrd/>) at the conclusion of the 2017 season. Data on ergast is gathered and published to the public domain by Chris Newell.
+## Dataset Descriptions
 
-The raw data is comprised of the below 13 files (where code chunks represent dimensions and summary statistics). The 'laptimes' table is the largest, containing over 400,000 records. Due to my decision to set the grain to driver race outcomes (as opposed to lap times), the 'results' file dictated the overall number of observations at just under 30,000.
+Data for this project was obtained from **Kaggle** (<https://www.kaggle.com/cjgdev/formula-1-race-data-19502017>). It was originally sourced from **Ergast Developer API** (<https://ergast.com/mrd/>) at the conclusion of the 2017 season. Data on ergast is gathered and published to the public domain by Chris Newell.
+
+The raw data is comprised of the below 13 files, where code chunks contain table dimensions and summary statistics. The 'laptimes' table is the largest file, containing over 400,000 records. Due to my decision to change the grain to race outcome per driver (as opposed to lap times per driver, per race), the 'results' file dictated the overall number of observations at just under 30,000.
 
 ```{r include=FALSE}
 #### Load packages ####
@@ -72,7 +73,6 @@ dim(circuits)
 summary(circuits)
 ```
 
-
 **constructorResults:** aggregated constructor points earned per race
 ```{r echo=FALSE}
 dim(constructorResults)
@@ -106,7 +106,6 @@ summary(drivers)
 dim(driverStandings)
 summary(driverStandings)
 ```
-  + thought: if you could associate a race with its round #, then driver with most points after final round wins championship
 
 **lapTimes:** lap time and position for each driver in each lap of each race
 ```{r echo=FALSE}
@@ -114,8 +113,7 @@ dim(lapTimes)
 summary(lapTimes)
 ```
   + file is missing lap times from at least races 400-800 (by raceID)
-  + consider excluding lap 25 of raceId 847 (2011 Canadian Grand Prix had "torrential rains" that caused a single lap to clock in at over 2 hrs)
-  + consider excluding file altogether
+  + lap 25 of raceId 847 (2011 Canadian Grand Prix had "torrential rains" that caused a single lap to clock in at over 2 hrs)
 
 **pitStops:** stop number and stop duration/milliseconds of each pitstop at a given time of day on a given lap by a given driver
 ```{r echo=FALSE}
@@ -123,9 +121,6 @@ dim(pitStops)
 summary(pitStops)
 ```
   + file excludes races before 2011 and after 2017
-  + consider aggregating 'milliseconds' per driver per race to obtain a single total pit time per race
-  + consider obtaining largest number of 'stop' per driver per race to get total number of pit stops per race
-  + consider excluding file altogether
 
 **qualifying:** qualifying times (and final qualifying position) for each driver of each race
 ```{r echo=FALSE}
@@ -135,7 +130,6 @@ summary(qualifying)
   + the process of qualifying determines grid position at start of race
   + the slowest drivers (e.g. bottom 5) get knocked out after each round of qualifying
   + 'position' should be the same as grid in results file
-  + consider excluding file altogether because of NAs
 
 **races:** race name, date, and time for each seasons, and wiki page url
 ```{r echo=FALSE}
@@ -143,7 +137,6 @@ dim(races)
 summary(races)
 ```
   + race time is empty from 1950 to 2005
-  + consider removing 'time'
   + remove 'name' which will be redundant after merge (circuits table contains ref)
 
 **results:** results of every race (*critical file containing dependent variables*)
@@ -153,10 +146,8 @@ summary(results)
 ```
   + 'time' is inconsistently represented as minutes:seconds beyond 1 hr for first place driver, then the gap for next several drivers
   + no time is recorded for racers greater than 1 lap behind the winner
-  + consider just including 'time' for winner, otherwise it's reflected as "gap" and often +1 laps rather than a time
   + 'position' = raceFinish, 'positionText' = raceFinish or descriptor of retired/disqualified etc., 'positionOrder' = raceFinish or order of retired/disqualified
   + positionText: D=Disqualified, E=Excluded, F=Did Not (/failed to) Qualify, N=Not Classified, R=Retired, W=Withrew
-  + consider converting 'positionText' to boolean (i.e. Finished, Did not finish)
   + fastest lap data is empty or NA from 1950 to 2004
   + 'grid' is mostly a duplicate of position in qualifying table, but is likely more reliable
 
@@ -176,26 +167,28 @@ summary(status)
 
 ## Data Preprocessing
 
-Preprocessing was broken down into two sections: 1. Individual file cleaning, and 2. Merged file cleaning. For the individual files portion, I treated every file as if it could be utilized (e.g. during Stage 3), despite my personal decision to exclude records lap times, qualifying times, etc. After the individual files were cleaned, I joined the files and continued with the cleaning, e.g. correcting typos, removing outliers, handling NAs, and additional feature creation.
+The preprocessing phase took place in two stages:
 
-Much of the cleaning took the form of deleting and renaming columns.
+1. **Individual file cleaning** - For this phase I treated every file as if it could be utilized at some point (e.g. during Stage 3), despite my personal decision to exclude records for lap times, pitStops, qualifying times, etc. This is when most of the field renaming, deleting, and data type converting took place.
 
-The entire process involved several interations of inspection/exploration, cleaning, data transformation, etc. 
+2. **Merged file cleaning** - After the individual files were cleaned, I merged the files through a series of left joins beginning on 'results', which contained the dependent variable(s). During this stage I continued to clean data, e.g. correcting typos, removing outliers, handling NAs, and additional feature creation, etc. I also merged latitude, longitude data for drivers' home towns.
 
-The below code was used for each and every section (where df = data frame). I excluded it from the report for space-saving purposes.
-```{r}
-# inspect file for completeness
-# df(df == "" | df == "NULL" | is.na(df))
-```
+The entire process involved several interations of exploration, cleaning, and data transformation. The specifics of what was performed is outlined in the comments of the code chunks.
 
 
 ### Individual File Cleaning
 
 ```{r}
-## circuits -----------------------------------------------------------------
+# The below code was used for each and every section (where df = data frame) to inspect for completeness. It is not displayed repeatedly for space-saving purposes.
 
-# inspect file for completeness
-colSums(circuits == "" | circuits == "NULL" | is.na(circuits))
+# df(df == "" | df == "NULL" | is.na(df))
+
+```
+
+
+```{r}
+
+## circuits -----------------------------------------------------------------
 
 # remove columns: 'name', 'alt' ('name' is dirtier and lengthier than 'circuitRef' & 'alt' appears to have no meaning)
 # keep columns: 'url', 'lat', 'long' in case wanting to scrape wiki pages and/or calculate distance (e.g. from home)
@@ -206,22 +199,13 @@ circuits[c(4,18,20), "location"] <- c("Montmelo", "Sao Paulo", "Nurburg")
 
 # rename columns
 circuits <- circuits %>%
-  rename("circuit_name" = "circuitRef",
-         "circuit_city" = "location",
-         "circuit_country" = "country",
-         "circuit_lat" = "lat",
-         "circuit_long" = "lng",
-         "circuit_url" = "url"
+  rename("circuit_name" = "circuitRef", "circuit_city" = "location", "circuit_country" = "country", "circuit_lat" = "lat", "circuit_long" = "lng", "circuit_url" = "url"
          )
-
 
 
 ## constructorResults -------------------------------------------------------
 
 # 'D' in 'status' column represents 'Disqualified' due to Spygate scandal in 2007 season (https://en.wikipedia.org/wiki/2007_Formula_One_espionage_controversy)
-
-# inspect file for completeness
-colSums(constructorResults == "" | constructorResults == "NULL" | is.na(constructorResults))
 
 # inspect distribution of 'status' (see above description of 'D') & remove column
 table(constructorResults$status)
@@ -235,30 +219,20 @@ constructorResults <- constructorResults %>%
   rename("constructorResult_pointsPerRace" = "points")
 
 
-
 ## constructors -------------------------------------------------------------
 
 # again keeping 'url' column incase of desire to scrape
-
-# inspect for completeness
-colSums(constructors == "" | constructors == "NULL" | is.na(constructors))
 
 # remove columns: 'name', 'X' ('X' is entirely NA values)
 constructors <- subset(constructors, select = -c(X, name))
 
 # rename columns
 constructors <- constructors %>%
-  rename("constructor_name" = "constructorRef",
-         "constructor_nationality" = "nationality",
-         "constructor_url" = "url"
+  rename("constructor_name" = "constructorRef", "constructor_nationality" = "nationality", "constructor_url" = "url"
          )
 
 
-
 ## constructorStandings -----------------------------------------------------
-
-# inspect file for completeness
-colSums(constructorStandings == "" | constructorStandings == "NULL" | is.na(constructorStandings))
 
 # remove column: 'positionText' ('positionText' is identical to 'position' with the exception of 'E' for excluded due to "Spygate" scandal (see constructorResults section))
 # remove column: 'X' ('X' is entirely NA values)
@@ -269,17 +243,11 @@ constructorStandings$points <- as.integer(constructorStandings$points)
 
 # rename columns
 constructorStandings <- constructorStandings %>%
-  rename("constructorStanding_runningTotalPointsInSeason" = "points",
-         "constructorStanding_runningPositionInSeason" = "position",
-         "constructorStanding_runningTotalWinsInSeason" = "wins"
+  rename("constructorStanding_runningTotalPointsInSeason" = "points", "constructorStanding_runningPositionInSeason" = "position", "constructorStanding_runningTotalWinsInSeason" = "wins"
          )
 
 
-
 ## drivers ------------------------------------------------------------------
-
-# inspect file for completeness
-colSums(drivers == "" | drivers == "NULL" | is.na(drivers))
 
 # remove column: 'number' ('number' is arbitrary driver/car number)
 # remove columns: 'code' 'forename', 'surname' ('code' serves no purpose $ forename' and 'surname' are messier and lengthier than 'driverRef')
@@ -296,20 +264,11 @@ drivers$dob <- ymd(drivers$dob)
 
 # rename columns
 drivers <- drivers %>%
-  rename("driver_name" = "driverRef",
-         "driver_dob" = "dob",
-         "driver_nationality" = "nationality",
-         "driver_url" = "url"
+  rename("driver_name" = "driverRef", "driver_dob" = "dob", "driver_nationality" = "nationality", "driver_url" = "url"
          )
 
 
-
 ## driverStandings ----------------------------------------------------------
-
-# thought: if you could associate a race with its round #, then driver with most points after final round wins championship
-
-# inspect file for completeness
-colSums(driverStandings == "" | driverStandings == "NULL" | is.na(driverStandings))
 
 # remove column: 'positionText' ('positionText' is identical to 'position' with the exception of 'D' for disqualification from the championship due to intentional collision)
 driverStandings <- subset(driverStandings, select = -positionText)
@@ -319,21 +278,13 @@ driverStandings$points <- as.integer(driverStandings$points)
 
 # rename columns
 driverStandings <- driverStandings %>%
-  rename("driverStanding_runningTotalPointsInSeason" = "points",
-         "driverStanding_runningPositionInSeason" = "position",
-         "driverStanding_runningTotalWinsInSeason" = "wins"
+  rename("driverStanding_runningTotalPointsInSeason" = "points", "driverStanding_runningPositionInSeason" = "position", "driverStanding_runningTotalWinsInSeason" = "wins"
          )
-
 
 
 ## lapTimes -----------------------------------------------------------------
 
-# file is missing lap times from at least races 400-800 (by raceID)
-# consider excluding lap 25 of raceId 847 (2011 Canadian Grand Prix had "torrential rains" that caused a single lap to clock in at over 2 hrs)
-# consider excluding file altogether
-
-# inspect file for completeness
-colSums(lapTimes == "" | lapTimes == "NULL" | is.na(lapTimes))
+# inspect distribution of lap times
 hist(lapTimes$raceId)
 
 # remove column: 'time' ('time' == 'milliseconds')
@@ -351,21 +302,12 @@ lapTimes <- lapTimes %>%
 
 # rename columns
 lapTimes <- lapTimes %>%
-  rename("lapTime_positionInLap" = "position",
-         "lapTime_millisec" = "milliseconds"
-         )
-
+  rename("lapTime_positionInLap" = "position", "lapTime_millisec" = "milliseconds")
 
 
 ## pitStops -----------------------------------------------------------------
 
-# file excludes races before 2011 and after 2017
-# consider aggregating 'milliseconds' per driver per race to obtain a single total pit time per race
-# consider obtaining largest number of 'stop' per driver per race to get total number of pit stops per race
-# consider excluding file altogether
-
-# inspect file for completeness
-colSums(pitStops == "" | pitStops == "NULL" | is.na(pitStops))
+# inspect distribution of pit stops
 hist(pitStops$raceId)
 
 # remove column: 'duration' ('duration' == 'milliseconds')
@@ -389,21 +331,11 @@ pitStops <- pitStops %>%
 
 # rename columns
 pitStops <- pitStops %>%
-  rename("pitStop_stopNum" = "stop",
-         "pitStop_lap" = "lap",
-         "pitStop_timeOfDay" = "time",
-         "pitStop_durationMillisec" = "milliseconds"
+  rename("pitStop_stopNum" = "stop", "pitStop_lap" = "lap", "pitStop_timeOfDay" = "time", "pitStop_durationMillisec" = "milliseconds"
          )
 
 
-
 ## qualifying ---------------------------------------------------------------
-
-# 'position' should be the same as grid in results file
-# consider excluding file altogether because of NAs
-
-# inspect file for completeness 
-colSums(qualifying == "" | qualifying == "NULL" | is.na(qualifying))
 
 # remove column: 'number' ('number' is arbitrary driver/car number)
 qualifying <- subset(qualifying, select = -number)
@@ -435,22 +367,11 @@ qualifying <- subset(qualifying, select = -c(q1_minute:q3_decimal))
 
 # rename columns
 qualifying <- qualifying %>%
-  rename("qualifying_finishPosition" = "position",
-         "qualifying_q1Millisec" = "q1_milliseconds",
-         "qualifying_q2Millisec" = "q2_milliseconds",
-         "qualifying_q3Millisec" = "q3_milliseconds"
+  rename("qualifying_finishPosition" = "position", "qualifying_q1Millisec" = "q1_milliseconds", "qualifying_q2Millisec" = "q2_milliseconds", "qualifying_q3Millisec" = "q3_milliseconds"
          )
 
 
-
 ## races --------------------------------------------------------------------
-
-# race time is empty from 1950 to 2005
-# consider removing 'time'
-# remove 'name' which will be redundant after merge (circuit table contains ref)
-
-# inspect file for completeness
-colSums(races == "" | races == "NULL" | is.na(races))
 
 # convert 'date' to date type
 races$date <- ymd(races$date)
@@ -460,29 +381,11 @@ races$time <- times(races$time)
 
 # rename columns
 races <- races %>%
-  rename("race_year" = "year",
-         "race_round" = "round",
-         "race_name" = "name",
-         "race_date" = "date",
-         "race_time" = "time",
-         "race_url" = "url"
+  rename("race_year" = "year", "race_round" = "round", "race_name" = "name", "race_date" = "date", "race_time" = "time", "race_url" = "url"
          )
 
 
-
 ## results ------------------------------------------------------------------
-
-# 'time' is inconsistently represented as minutes:seconds beyond 1 hr for first place driver, then the gap for next several drivers
-# no time is recorded for racers greater than 1 lap behind the winner
-# consider just including 'time' for winner, otherwise it's reflected as "gap" and often +1 laps rather than a time
-# 'position' = raceFinish, 'positionText' = raceFinish or descriptor of retired/disqualified etc., 'positionOrder' = raceFinish or order of retired/disqualified
-# positionText: D=Disqualified, E=Excluded, F=Did Not (/failed to) Qualify, N=Not Classified, R=Retired, W=Withrew
-# consider converting 'positionText' to boolean (i.e. Finished, Did not finish)
-# fastest lap data is empty or NA from 1950 to 2004
-# 'grid' is mostly a duplicate of position in qualifying table, but is likely more reliable
-
-# inspect file for completeness
-colSums(results == "" | results == "NULL" | is.na(results))
 
 # remove columns: 'position', 'number', 'time', 'fastestLap', 'rank', 'fastestLapTime', 'fastestLapSpeed'
 # ('position' is redundant, 'number' is arbitrary driver/car number, 'time' is represented more cleanly in 'milliseconds')
@@ -519,25 +422,11 @@ results <- subset(results, select = -c(fLT_minute:fLT_decimal))
 
 # rename columns
 results <- results %>%
-  rename("result_startingGridPosition" = "grid",
-         "result_finishOrder" = "positionOrder",
-         "result_pointsEarned" = "points",
-         "result_lapsCompleted" = "laps",
-         "result_finishTimeMillisec" = "milliseconds",
-         "result_fastestLapTimeMillisec" = "fLT_milliseconds",
-         "result_fastestLap" = "fastestLap",
-         "result_fastestLapRank" = "rank",
-         "result_fastestLapSpeed" = "fastestLapSpeed"
+  rename("result_startingGridPosition" = "grid", "result_finishOrder" = "positionOrder", "result_pointsEarned" = "points", "result_lapsCompleted" = "laps", "result_finishTimeMillisec" = "milliseconds", "result_fastestLapTimeMillisec" = "fLT_milliseconds", "result_fastestLap" = "fastestLap", "result_fastestLapRank" = "rank", "result_fastestLapSpeed" = "fastestLapSpeed"
          )
 
 
-
 ## seasons ------------------------------------------------------------------
-
-# somewhat irrelevant file unless wanting to scrape wiki pages
-
-# inspect file for completeness
-colSums(seasons == "" | seasons == "NULL" | is.na(seasons))
 
 # convert year to date type
 seasons$year <- as.character(seasons$year)
@@ -546,16 +435,10 @@ seasons$year <- as.Date(paste(seasons$year, 12, 31, sep = "-")) # end of year
 
 # rename columns
 seasons <- seasons %>%
-  rename("season_year" = "year",
-         "season_url" = "url"
-         )
-
+  rename("season_year" = "year", "season_url" = "url")
 
 
 ## status ------------------------------------------------------------------
-
-# inspect file for completeness
-colSums(status == "" | status == "NULL" | is.na(status))
 
 # rename column
 colnames(status) [colnames(status) == "status"] <- "status_description"
@@ -589,10 +472,8 @@ write.csv(status, file.path(path_out1, "status_clean.csv"), row.names = F)
 # read in country Codes
 countryCodes <- read.csv("../Raw Source Data/countryCodes.csv", stringsAsFactors = FALSE)
 
-
 # manually correct errors caused by accent marks
 countryCodes[1214, 1] <- "Monegasque"
-
 
 # join countryCodes to drivers and constructors to convert nationality to country
 drivers <- drivers %>%
@@ -605,7 +486,6 @@ constructors <- constructors %>%
   select(-constructor_nationality) %>%
   rename("constructor_homeCountry" = "Country")
 
-
 # manually correct errors cause by compound nationalities (e.g. 'East German') or similar causes
 drivers[496, 5] <- "Italy"
 drivers[578, 5] <- "Italy"
@@ -616,42 +496,32 @@ drivers[718, 5] <- "Germany"
 constructors[100, 4] <- "Belgium"
 constructors[146, 4] <- "Germany"
 
-
 # join countriesLatLong to drivers to obtain lat, long coordinates
 # source: https://github.com/knowitall/chunkedextractor/blob/master/src/main/resources/edu/knowitall/chunkedextractor/demonyms.csv
 countriesLatLong <- read.csv("../Raw Source Data/countries_LatLong.csv", stringsAsFactors = FALSE)
 
 drivers <- drivers %>%
   left_join(countriesLatLong, by = c("driver_homeCountry" = "name")) %>%
-  rename("driver_lat" = "latitude",
-         "driver_long" = "longitude",
-         )
-
+  rename("driver_lat" = "latitude", "driver_long" = "longitude")
 
 # clean missing lat, long for "Rhodesia"
 # arrange rows by driver_homeCountry
 drivers <- drivers %>%
   arrange(driver_homeCountry)
 
-
 # manually update missing lat, longs
 drivers[445:448, 6] <- -19.0154381
 drivers[445:448, 7] <- 29.1548576
-
 
 # join countriesLatLong to constructors to obtain lat, long coordinates
 # source: https://github.com/knowitall/chunkedextractor/blob/master/src/main/resources/edu/knowitall/chunkedextractor/demonyms.csv
 constructors <- constructors %>%
   left_join(countriesLatLong, by = c("constructor_homeCountry" = "name")) %>%
-  rename("constructor_lat" = "latitude",
-         "constructor_long" = "longitude",
-  )
-
+  rename("constructor_lat" = "latitude", "constructor_long" = "longitude")
 
 # manually update missing lat, longs
 constructors[93, 5] <- -19.0154381
 constructors[93, 6] <- 29.1548576
-
 
 # join source tables beginning from 'results' in reverse alphabetical order
 # confirm primary key
@@ -659,30 +529,23 @@ results %>%
   count(resultId) %>%
   filter(n > 1)
 
-
 # join status
 resultsHistorical <- results %>%
   left_join(status, by = "statusId") %>%
   select(-statusId)
 
-
 # exclude seasons
-
 
 # join races
 resultsHistorical <- resultsHistorical %>%
   left_join(races, by = "raceId") %>%
   select(-race_name, -race_year, -race_time, -race_url)
 
-
 # exclude qualifying
-
 
 # exclude pitStops
 
-
 # exclude lapTimes
-
 
 # join driverStandings
 # confirm primary key
@@ -694,12 +557,10 @@ resultsHistorical <- resultsHistorical %>%
   left_join(driverStandings, by = c("raceId", "driverId")) %>%
   select(-driverStandingsId)
 
-
 # join drivers
 resultsHistorical <- resultsHistorical %>%
   left_join(drivers, by = "driverId") %>%
   select(-driverId, -driver_url)
-
 
 # join constructorStandings
 # confirm primary key
@@ -711,19 +572,16 @@ resultsHistorical <- resultsHistorical %>%
   left_join(constructorStandings, by = c("raceId", "constructorId")) %>%
   select(-constructorStandingsId)
 
-
 # join constructors
 resultsHistorical <- resultsHistorical %>%
   left_join(constructors, by = "constructorId") %>%
   select(-constructor_url)
-
 
 # join constructorResults
 # confirm primary key
 constructorResults %>%
   count(raceId, constructorId) %>%
   filter(n > 1)
-
 
 # remove duplicate records
 constructorResults <- constructorResults[-c(9632, 10355),]
@@ -732,26 +590,19 @@ resultsHistorical <- resultsHistorical %>%
   left_join(constructorResults, by = c("raceId", "constructorId")) %>%
   select(-constructorResultsId, -constructorId)
 
-
 # join circuits
 resultsHistorical <- resultsHistorical %>%
   left_join(circuits, by = "circuitId") %>%
   select(-circuitId, -circuit_url, -circuit_lat, -circuit_long)
 
 
-
-
 #### Clean Newly Merged Data Frame ####
-
-# consider converting points earned to boolean
-# consider creating a normalized column of % of total laps finished in previous race round
 
 # inspect df (below 4 lines commented out for space-saving purposes)
 # glimpse(resultsHistorical)
 # summary(resultsHistorical)
 # colSums(is.na(resultsHistorical))
 # head(resultsHistorical)
-
 
 #normalize laps completed field
 resultsHistorical <- resultsHistorical %>%
@@ -767,18 +618,14 @@ resultsHistorical <- resultsHistorical %>%
   ungroup() %>%
   as.data.frame()
 
-
 # remove resultId column which is no longer needed
 resultsHistorical <- subset(resultsHistorical, select = -resultId)
-
 
 # remove result_finishTimeMillisec due to difficult to handle NAs
 resultsHistorical <- subset(resultsHistorical, select = -result_finishTimeMillisec)
 
-
 # remove columns relating to fastest lap data which contain many untreatable NAs
 resultsHistorical <- subset(resultsHistorical, select = -c(result_fastestLap:result_fastestLapSpeed, result_fastestLapTimeMillisec))
-
 
 # fill NAs in 'points' & 'wins' related columns with 0 and remove 'position' related columns
   # NAs in 'driverStandings.' and 'consturctorStandings.' caused by failures to qualify in early season races
@@ -798,7 +645,6 @@ resultsHistorical$constructorResult_pointsPerRace[is.na(resultsHistorical$constr
 
 resultsHistorical <- subset(resultsHistorical, select = -constructorStanding_runningPositionInSeason)
 
-
 # create driver age at time of race feature and convert to int
 # remove 'driver_dob' (consider re-adding in future to analyze race results on closeness to birthday)
 resultsHistorical <- resultsHistorical %>%
@@ -807,7 +653,6 @@ resultsHistorical <- resultsHistorical %>%
          )
 
 resultsHistorical$driverAge <- as.integer(resultsHistorical$driverAge)
-
 
 # correct outlier
 resultsHistorical[17012, "driverAge"] = 33
@@ -821,36 +666,21 @@ resultsHistorical <- resultsHistorical %>%
          race_date = NULL
          )
 
-
-# create race in driver home country? and constructor home country (True or False) feature and remove existing fields
-# resultsHistorical <- resultsHistorical %>%
-  # mutate(driverHomeCountry = (substr(circuit_country, 1, 3) == substr(driver_nationality, 1, 3)),
-         # constructorHomeCountry = (substr(circuit_country, 1, 3) == substr(constructor_nationality, 1, 3)),
-         # driver_nationality = NULL,
-         # constructor_nationality = NULL,
-         # circuit_country = NULL
-         # )
-
-
 # create running total points going into race for driver and constructor and remove existing columns
 resultsHistorical <- resultsHistorical %>%
   mutate(driver_preRaceTotPoints = driverStanding_runningTotalPointsInSeason - result_pointsEarned,
          constructor_preRaceTotPoints = constructorStanding_runningTotalPointsInSeason - constructorResult_pointsPerRace,
          )
 
-
 # correct for inaccurate observations (i.e. negative points) caused by NAs from disqualification, failure to qualify, etc.
 # 1 error in driverPoints
 resultsHistorical$driver_preRaceTotPoints <- ifelse(resultsHistorical$driver_preRaceTotPoints < 0, 0, resultsHistorical$driver_preRaceTotPoints)
 
-
 # ~50 errors in constructor points
 resultsHistorical$constructor_preRaceTotPoints <- ifelse(resultsHistorical$constructor_preRaceTotPoints < 0, 0, resultsHistorical$constructor_preRaceTotPoints)
 
-
 # remove unnecessary columns
 resultsHistorical <- subset(resultsHistorical, select = -c(driverStanding_runningTotalPointsInSeason, constructorStanding_runningTotalPointsInSeason))
-
 
 # create running total wins going into race for driver and constructor and remove existing columns
 resultsHistorical <- resultsHistorical %>%
@@ -864,21 +694,17 @@ resultsHistorical <- resultsHistorical %>%
          constructorStanding_runningTotalWinsInSeason = NULL
          )
 
-
 # ungroup columns
 resultsHistorical <- resultsHistorical %>%
   ungroup() %>%
   as.data.frame()
 
-
 # correct for inaccurate observations (i.e. negative points) caused by NAs from disqualification, failure to qualify, etc.
-# >200  in constructorTotWins
+# >200 in constructorTotWins
 resultsHistorical$constructor_preRaceTotWins <- ifelse(resultsHistorical$constructor_preRaceTotWins < 0, 0, resultsHistorical$constructor_preRaceTotWins)
-
 
 # remove unnecessary columns
 resultsHistorical <- subset(resultsHistorical, select = -c(raceId, constructorResult_pointsPerRace))
-
 
 # create features which contain previous race results and remove current race result fields
 resultsHistorical <- resultsHistorical %>%
@@ -891,13 +717,11 @@ resultsHistorical <- resultsHistorical %>%
          status_description = NULL
          )
 
-
 # convert columns (driverAge, percentOfPreviousRaceCompleted, preRaceTotPoints, preRaceTotWins) to integers
 resultsHistorical$driverAge <- as.integer(resultsHistorical$driverAge)
 resultsHistorical$result_percentOfPreviousRaceCompleted <- as.integer(resultsHistorical$result_percentOfPreviousRaceCompleted)
 resultsHistorical$driver_preRaceTotPoints <- as.integer(resultsHistorical$driver_preRaceTotPoints)
 resultsHistorical$driver_preRaceTotWins <- as.integer(resultsHistorical$driver_preRaceTotWins)
-
 
 # convert pointsEarned to boolean
 resultsHistorical <- resultsHistorical %>%
@@ -905,21 +729,12 @@ resultsHistorical <- resultsHistorical %>%
          result_pointsEarned = NULL
   )
 
-
 # arrange rows
 resultsHistorical <- resultsHistorical %>%
   arrange(race_year, race_round, result_finishOrder, result_startingGridPosition)
 
-
 # arrange columns
-resultsHistorical <- resultsHistorical[, c("result_finishOrder", "result_inThePoints", "result_startingGridPosition", 
-                                           "driver_name", "constructor_name", "circuit_name", "circuit_city", "race_month",
-                                           "race_year", "race_round", "driverAge", "driver_homeCountry", "driver_lat", "driver_long",
-                                           "constructor_homeCountry", "constructor_lat", "constructor_long",
-                                           "result_percentOfPreviousRaceCompleted", "result_previousFinishDescrip",
-                                           "status_previousDescrip", "driver_preRaceTotPoints", "constructor_preRaceTotPoints",
-                                           "driver_preRaceTotWins", "constructor_preRaceTotWins")]
-
+resultsHistorical <- resultsHistorical[, c("result_finishOrder", "result_inThePoints", "result_startingGridPosition", "driver_name", "constructor_name", "circuit_name", "circuit_city", "race_month", "race_year", "race_round", "driverAge", "driver_homeCountry", "driver_lat", "driver_long", "constructor_homeCountry", "constructor_lat", "constructor_long", "result_percentOfPreviousRaceCompleted", "result_previousFinishDescrip", "status_previousDescrip", "driver_preRaceTotPoints", "constructor_preRaceTotPoints", "driver_preRaceTotWins", "constructor_preRaceTotWins")]
 
 # remove columns due to appeared unreliability
 resultsHistorical <- subset(resultsHistorical, select = -c(constructor_preRaceTotPoints, constructor_preRaceTotWins))
@@ -972,22 +787,17 @@ aggr(drivers)
 # partition the data
 driversLatLong <- drivers[,c(2, 6:7)]
 
-
 # convert driver name to factor
 driversLatLong$driver_name <- as.factor(driversLatLong$driver_name)
-
 
 # set seed for randmozing data
 set.seed(20)
 
-
 # run k-means
 clusters <- kmeans(driversLatLong[,c(2:3)], 4)
 
-
 # inspect cluters
 str(clusters)
-
 
 # plot clusters (attempt multiple times if necessary)
 num_clusters <- 4
@@ -1003,14 +813,12 @@ num_clusters <- 4
 driversLatLong <- driversLatLong %>%
   mutate(driverCluster = as.factor(clusters$cluster))
 
-
 # create a function that returns the value of totwithinss, and takes inputdataset and number of clusters
 # credit: Dr. Binh Zhang, The University of Arizona
 kmeans.totwithinss.k <- function(dataset, number_of_centers){
   km <- kmeans(dataset, number_of_centers)
   km$tot.withinss
   }
-
 
 # create a function that returns a series of totwithinss values, and takes input maxk
 # vec is a vector that contains totwithinss values associated with k from 1 to maxk
@@ -1020,7 +828,6 @@ kmeans.distortion <- function(dataset, maxk){
   vec[1:maxk] <- sapply(1:maxk, kmeans.totwithinss.k, dataset = dataset)
   return (vec)
   }
-
 
 # plot elbow curve
 maxk <- 10
@@ -1035,14 +842,11 @@ plot(1:maxk, # horizontal axis
      ylab = "Distortion"
      )
 
-
 # reintroduce cluster results to resultsHistorical
 driversLatLong <- subset(driversLatLong, select = -c(driver_lat, driver_long))
 
 resultsHistorical <- resultsHistorical %>%
   left_join(driversLatLong, by = "driver_name")
-
-
 
 
 #### Predict ####
@@ -1058,7 +862,6 @@ resultsNB <- subset(resultsHistorical, select = -c(
   result_finishOrder,driver_lat, driver_long, constructor_lat, constructor_long)
   )
 
-
 # partition data for training and testing
 sample_size <- floor(0.7 * nrow(resultsNB))
 
@@ -1066,11 +869,9 @@ training_index <- sample(nrow(resultsNB), size = sample_size, replace = FALSE)
 train <- resultsNB[training_index,]
 test <- resultsNB[-training_index,]
 
-
 # check dimensions of partitions
 dim(train)
 dim(test)
-
 
 # fit model
 results.model <- naiveBayes(result_inThePoints ~ . , data = train)
@@ -1080,7 +881,6 @@ results.model <- naiveBayes(result_inThePoints ~ . , data = train)
 
 # test model
 results.predict <- predict(results.model, test, type = 'class')
-
 
 # test model against recent Brazil Grand Prix results
 testBrazil <- read.csv("../Processed Data/brazil2019.csv")
@@ -1109,19 +909,16 @@ train %>%
   cor() %>%
   corrplot::corrplot()
 
-
 # create confusion matrix
 resultsNB_output <- data.frame(actual = test[,'result_inThePoints'], predicted = results.predict)
 
 table(resultsNB_output)
-
 
 # assign 'True Positive', 'False Positive', 'True Negative', 'False Negative'
 TP <- 1161
 FP <- 715
 TN <- 4629
 FN <- 921
-
 
 # calculate evaluation metrics
 errorRate <- (FP + FN) / (TP + FP + TN + FN)
@@ -1132,9 +929,8 @@ precision <- TP / (TP + FP)
 falsePositiveRate <- FP / (TN + FP)
 
 
-
-
 ## Overall Results -------------------------------------------------------
+
 
 # error rate = .2203
 # model accuracy = .7797
