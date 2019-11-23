@@ -1,4 +1,4 @@
-"resultId","raceId","driverId","constructorId","result_startingGridPosition","result_finishOrder","result_pointsEarned","result_lapsCompleted","result_finishTimeMillisec","result_fastestLap","result_fastestLapRank","result_fastestLapSpeed","statusId","results_finishDescription","result_fastestLapTimeMillisec"
+"resultId","raceId","driverId","constructorId","result_startingGridPosition","result_finishOrder","result_pointsEarned","result_lapsCompleted","result_finishTimeMillisec","result_fastestLap","result_fastestLapRank","result_fastestLapSpeed","statusId","result_finishDescription","result_fastestLapTimeMillisec"
 1,18,1,1,1,1,10,58,5690616,39,2,218.3,1,"Finished",87500
 2,18,2,2,5,2,8,58,5696094,41,3,217.586,1,"Finished",87700
 3,18,3,3,7,3,6,58,5698779,41,5,216.719,1,"Finished",88100

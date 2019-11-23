@@ -1,4 +1,4 @@
-"driverId","driver_Name","driver_dob","driver_nationality","driver_url"
+"driverId","driver_name","driver_dob","driver_nationality","driver_url"
 1,"hamilton",1985-01-07,"British","http://en.wikipedia.org/wiki/Lewis_Hamilton"
 2,"heidfeld",1977-05-10,"German","http://en.wikipedia.org/wiki/Nick_Heidfeld"
 3,"rosberg",1985-06-27,"German","http://en.wikipedia.org/wiki/Nico_Rosberg"

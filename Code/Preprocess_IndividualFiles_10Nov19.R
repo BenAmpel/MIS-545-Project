@@ -1,4 +1,4 @@
-##################################################################################################
+#############################################################################
 #### Introduction ####
 
 ## Title: F1 Preprocessing - Individual Source Files
@@ -13,35 +13,22 @@
   # Sections are arranged in alphabetical order and contain section-specific notes
   # A separate script will be created for joining the data frames
 
-##################################################################################################
+#############################################################################
 
 
 
 
-#### Source Dataset Help ####
+#### Markdown ####
 
-# circuits: circuit name, location, and wiki page url
-# constructorResults: aggregated constructor points earned per race
-# constructors: constructor name, nationality, and wiki page url
-# constructorStandings: running/accumulated 'points' and 'wins' for constructors in a given season
-# drivers: driver name, number, dob, nationality, and wiki page url
-# driverStandings: accumulated driver points and wins for a given season
-# lapTimes: lap time and position for each driver in each lap of each race
-# pitStops: stop number and stop duration/milliseconds of each pitstop at a given time of day on a given lap by a given driver
-# qualifying: qualifying times (and final qualifying position) for each driver of each race
-# races: race name, date, and time for each seasons, and wiki page url
-# *results*: results of every race (*critical file containing dependent variables*)
-# seasons: year and wiki page url of each season
-# status: key and description of race results (e.g. finished, +1 Lap, collision, etc.)
+# ignore this section for normal processing
+# load blank workspace when compiling/knitting
+# extra dots also are added to file paths for compilation purposes, remove when running script
 
 
-install.packages('tinytex')
-library(tinytex)
+
 
 #### Load packages ####
 
-install.packages("tidyverse")
-install.packages("chron")
 library(tidyverse)
 library(lubridate)
 library(chron)
@@ -74,7 +61,7 @@ status <- read.csv(file.path(path_in, "status.csv"), stringsAsFactors = F)
 
 #### Clean data ####
 
-## circuits -------------------------------------------------------------------------------
+## circuits -----------------------------------------------------------------
 
 # inspect file for completeness
 colSums(circuits == "" | circuits == "NULL" | is.na(circuits))
@@ -99,7 +86,7 @@ circuits <- circuits %>%
 
 
 
-## constructorResults -------------------------------------------------------------------------------
+## constructorResults -------------------------------------------------------
 
 # 'D' in 'status' column represents 'Disqualified' due to Spygate scandal in 2007 season (https://en.wikipedia.org/wiki/2007_Formula_One_espionage_controversy)
 
@@ -120,7 +107,7 @@ constructorResults <- constructorResults %>%
 
 
 
-## constructors --------------------------------------------------------------------------------
+## constructors -------------------------------------------------------------
 
 # again keeping 'url' column incase of desire to scrape
 
@@ -140,7 +127,7 @@ constructors <- constructors %>%
 
 
 
-## constructorStandings -------------------------------------------------------------------------------
+## constructorStandings -----------------------------------------------------
 
 # inspect file for completeness
 colSums(constructorStandings == "" | constructorStandings == "NULL" | is.na(constructorStandings))
@@ -162,7 +149,7 @@ constructorStandings <- constructorStandings %>%
 
 
 
-## drivers -------------------------------------------------------------------------------
+## drivers ------------------------------------------------------------------
 
 # inspect file for completeness
 colSums(drivers == "" | drivers == "NULL" | is.na(drivers))
@@ -191,7 +178,7 @@ drivers <- drivers %>%
 
 
 
-## driverStandings -------------------------------------------------------------------------------
+## driverStandings ----------------------------------------------------------
 
 # thought: if you could associate a race with its round #, then driver with most points after final round wins championship
 
@@ -214,7 +201,7 @@ driverStandings <- driverStandings %>%
 
 
 
-## lapTimes -------------------------------------------------------------------------------
+## lapTimes -----------------------------------------------------------------
 
 # file is missing lap times from at least races 400-800 (by raceID)
 # consider excluding lap 25 of raceId 847 (2011 Canadian Grand Prix had "torrential rains" that caused a single lap to clock in at over 2 hrs)
@@ -246,7 +233,7 @@ lapTimes <- lapTimes %>%
 
 
 
-## pitStops -------------------------------------------------------------------------------
+## pitStops -----------------------------------------------------------------
 
 # file excludes races before 2011 and after 2017
 # consider aggregating 'milliseconds' per driver per race to obtain a single total pit time per race
@@ -287,7 +274,7 @@ pitStops <- pitStops %>%
 
 
 
-## qualifying -------------------------------------------------------------------------------
+## qualifying ---------------------------------------------------------------
 
 # 'position' should be the same as grid in results file
 # consider excluding file altogether because of NAs
@@ -334,7 +321,7 @@ qualifying <- qualifying %>%
 
 
 
-## races -------------------------------------------------------------------------------
+## races --------------------------------------------------------------------
 
 # race time is empty from 1950 to 2005
 # consider removing 'time'
@@ -362,7 +349,7 @@ races <- races %>%
 
 
 
-## results -------------------------------------------------------------------------------
+## results ------------------------------------------------------------------
 
 # 'time' is inconsistently represented as minutes:seconds beyond 1 hr for first place driver, then the gap for next several drivers
 # no time is recorded for racers greater than 1 lap behind the winner
@@ -425,7 +412,7 @@ results <- results %>%
 
 
 
-## seasons -------------------------------------------------------------------------------
+## seasons ------------------------------------------------------------------
 
 # somewhat irrelevant file unless wanting to scrape wiki pages
 
@@ -446,7 +433,7 @@ seasons <- seasons %>%
 
 
 
-## status -------------------------------------------------------------------------------
+## status ------------------------------------------------------------------
 
 # inspect file for completeness
 colSums(status == "" | status == "NULL" | is.na(status))

@@ -1,4 +1,5 @@
-##################################################################################################
+#############################################################################
+
 #### Introduction ####
 
 ## Title: F1 Preprocessing - Join Source Data
@@ -7,7 +8,7 @@
 
 ## IMPORTANT:
   # Run this script after running 'Preprocess_IndividualFiles_10Nov19'
-  # If running full script (and not wanting to overwrite files), avoid 'Write files' section at bottom
+  # If running full script, include 'Write files' section at bottom before advancing to 'Analyze_19Nov19'
 
 ## Description:
 # This R script performs joining and cleaning of processed F1 source data
@@ -16,46 +17,104 @@
   # 'Historical' - maximizes results back to 1950, but excludes newer measures such as fastest lap data
   # 'Modern' - includes newer measures, but excludes records before 2011
 
-##################################################################################################
+#############################################################################
 
 
 
 
-#### Source Dataset Descriptions ####
+#### Markdown ####
 
-# circuits: circuit name, location, and wiki page url
-# constructorResults: aggregated constructor points earned per race
-# constructors: constructor name, nationality, and wiki page url
-# constructorStandings: running/accumulated 'points' and 'wins' for constructors in a given season
-# drivers: driver name, number, dob, nationality, and wiki page url
-# driverStandings: accumulated driver points and wins for a given season
-# lapTimes: lap time and position for each driver in each lap of each race
-# pitStops: stop number and stop duration/milliseconds of each pitstop at a given time of day on a given lap by a given driver
-# qualifying: qualifying times (and final qualifying position) for each driver of each race
-# races: race name, date, and time for each seasons, and wiki page url
-# *results*: results of every race (*critical file containing dependent variables*)
-# seasons: year and wiki page url of each season
-# status: key and description of race results (e.g. finished, +1 Lap, collision, etc.)
+# ignore this section for normal processing
+# load blank workspace when compiling/knitting
+# extra dots also are added to file paths for compilation purposes, remove when running script
+# load("../metadata/workSpace_JoinFiles.RData")
 
 
 
 
 #### Load packages ####
 
-install.packages("tidyverse")
 library(tidyverse)
+library(lubridate)
+library(chron)
 
 
 
 
 #### Join Data Frames ####
 
-## Historical -------------------------------------------------------------------------------
+## Historical ---------------------------------------------------------------
+
 
 # This join focuses on maximizing historical data at the expense of newer measures such as pitStops and lapTimes
   # (i.e. excludes data such as pitStop times which are only recorded beginning in 2011)
 
-# join tables beginning from 'results' in reverse alphabetical order
+
+
+# read in country Codes
+countryCodes <- read.csv("./Raw Source Data/countryCodes.csv", stringsAsFactors = FALSE)
+
+# manually correct errors caused by accent marks
+countryCodes[1214, 1] <- "Monegasque"
+
+
+# join countryCodes to drivers and constructors to convert nationality to country
+drivers <- drivers %>%
+  left_join(countryCodes, by = c("driver_nationality" = "Nationality")) %>%
+  select(-driver_nationality) %>%
+  rename("driver_homeCountry" = "Country")
+
+constructors <- constructors %>%
+  left_join(countryCodes, by = c("constructor_nationality" = "Nationality")) %>%
+  select(-constructor_nationality) %>%
+  rename("constructor_homeCountry" = "Country")
+
+
+# manually correct errors cause by compound nationalities (e.g. 'East German') or similar causes
+drivers[496, 5] <- "Italy"
+drivers[578, 5] <- "Italy"
+drivers[714, 5] <- "Germany"
+drivers[715, 5] <- "Germany"
+drivers[718, 5] <- "Germany"
+
+constructors[100, 4] <- "Belgium"
+constructors[146, 4] <- "Germany"
+
+
+# join countriesLatLong to drivers to obtain lat, long coordinates
+# source: https://github.com/knowitall/chunkedextractor/blob/master/src/main/resources/edu/knowitall/chunkedextractor/demonyms.csv
+countriesLatLong <- read.csv("./Raw Source Data/countries_LatLong.csv", stringsAsFactors = FALSE)
+
+drivers <- drivers %>%
+  left_join(countriesLatLong, by = c("driver_homeCountry" = "name")) %>%
+  rename("driver_lat" = "latitude",
+         "driver_long" = "longitude",
+         )
+
+# clean missing lat, long for "Rhodesia"
+# arrange rows by driver_homeCountry
+drivers <- drivers %>%
+  arrange(driver_homeCountry)
+
+# manually update missing lat, longs
+drivers[445:448, 6] <- -19.0154381
+drivers[445:448, 7] <- 29.1548576
+
+
+# join countriesLatLong to constructors to obtain lat, long coordinates
+# source: https://github.com/knowitall/chunkedextractor/blob/master/src/main/resources/edu/knowitall/chunkedextractor/demonyms.csv
+constructors <- constructors %>%
+  left_join(countriesLatLong, by = c("constructor_homeCountry" = "name")) %>%
+  rename("constructor_lat" = "latitude",
+         "constructor_long" = "longitude",
+  )
+
+# manually update missing lat, longs
+constructors[93, 5] <- -19.0154381
+constructors[93, 6] <- 29.1548576
+
+
+# join source tables beginning from 'results' in reverse alphabetical order
 # confirm primary key
 results %>%
   count(resultId) %>%
@@ -222,13 +281,13 @@ resultsHistorical <- resultsHistorical %>%
 
 
 # create race in driver home country? and constructor home country (True or False) feature and remove existing fields
-resultsHistorical <- resultsHistorical %>%
-  mutate(driverHomeCountry = (substr(circuit_country, 1, 3) == substr(driver_nationality, 1, 3)),
-         constructorHomeCountry = (substr(circuit_country, 1, 3) == substr(constructor_nationality, 1, 3)),
-         driver_nationality = NULL,
-         constructor_nationality = NULL,
-         circuit_country = NULL
-         )
+# resultsHistorical <- resultsHistorical %>%
+  # mutate(driverHomeCountry = (substr(circuit_country, 1, 3) == substr(driver_nationality, 1, 3)),
+         # constructorHomeCountry = (substr(circuit_country, 1, 3) == substr(constructor_nationality, 1, 3)),
+         # driver_nationality = NULL,
+         # constructor_nationality = NULL,
+         # circuit_country = NULL
+         # )
 
 
 # create running total points going into race for driver and constructor and remove existing columns
@@ -290,9 +349,11 @@ resultsHistorical <- resultsHistorical %>%
          )
 
 
-# convert newly created columns to integers
-resultsHistorical <- resultsHistorical %>%
-  mutate_if(is.double, as.integer)
+# convert columns (driverAge, percentOfPreviousRaceCompleted, preRaceTotPoints, preRaceTotWins) to integers
+resultsHistorical$driverAge <- as.integer(resultsHistorical$driverAge)
+resultsHistorical$result_percentOfPreviousRaceCompleted <- as.integer(resultsHistorical$result_percentOfPreviousRaceCompleted)
+resultsHistorical$driver_preRaceTotPoints <- as.integer(resultsHistorical$driver_preRaceTotPoints)
+resultsHistorical$driver_preRaceTotWins <- as.integer(resultsHistorical$driver_preRaceTotWins)
 
 
 # convert pointsEarned to boolean
@@ -310,13 +371,14 @@ resultsHistorical <- resultsHistorical %>%
 # arrange columns
 resultsHistorical <- resultsHistorical[, c("result_finishOrder", "result_inThePoints", "result_startingGridPosition", 
                                            "driver_name", "constructor_name", "circuit_name", "circuit_city", "race_month",
-                                           "race_year", "race_round", "driverAge", "driverHomeCountry", "constructorHomeCountry",
+                                           "race_year", "race_round", "driverAge", "driver_homeCountry", "driver_lat", "driver_long",
+                                           "constructor_homeCountry", "constructor_lat", "constructor_long",
                                            "result_percentOfPreviousRaceCompleted", "result_previousFinishDescrip",
                                            "status_previousDescrip", "driver_preRaceTotPoints", "constructor_preRaceTotPoints",
                                            "driver_preRaceTotWins", "constructor_preRaceTotWins")]
 
 
-# remove columns due to appearing unreliable
+# remove columns due to appeared unreliability
 resultsHistorical <- subset(resultsHistorical, select = -c(constructor_preRaceTotPoints, constructor_preRaceTotWins))
 
 

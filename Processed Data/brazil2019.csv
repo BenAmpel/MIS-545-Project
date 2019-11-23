@@ -1,0 +1,21 @@
+﻿result_inThePoints,result_startingGridPosition,driver_name,constructor_name,circuit_name,circuit_city,race_month,race_year,race_round,driverAge,driver_homeCountry,constructor_homeCountry,result_percentOfPreviousRaceCompleted,result_previousFinishDescrip,status_previousDescrip,driver_preRaceTotPoints,driver_preRaceTotWins,driverCluster
+TRUE,1,max_verstappen,red_bull,interlagos,Sao Paulo,11,2019,20,22,Belgium,Austria,100,Finished,Finished,235,2,2
+FALSE,2,vettel,ferrari,interlagos,Sao Paulo,11,2019,20,32,Germany,Italy,13,Retired,Suspension,230,1,2
+TRUE,3,hamilton,mercedes,interlagos,Sao Paulo,11,2019,20,34,United Kingdom,Germany,100,Finished,Finished,381,10,2
+FALSE,4,leclerc,ferrari,interlagos,Sao Paulo,11,2019,20,22,Monaco,Italy,100,Finished,Finished,249,2,2
+FALSE,5,bottas,mercedes,interlagos,Sao Paulo,11,2019,20,30,Finland,Germany,100,Finished,Finished,314,4,2
+FALSE,6,albon,red_bull,interlagos,Sao Paulo,11,2019,20,23,Thailand,Austria,100,Finished,Finished,84,0,4
+TRUE,7,gasly,toro_rosso,interlagos,Sao Paulo,11,2019,20,23,France,Italy,96,Retired,Suspension,77,0,2
+FALSE,8,grosjean,haas,interlagos,Sao Paulo,11,2019,20,33,France,United States,98,Finished,+1 Lap,8,0,2
+TRUE,9,raikkonen,alfa,interlagos,Sao Paulo,11,2019,20,40,Finland,Italy,98,Finished,+1 Lap,31,0,2
+FALSE,10,kevin_magnussen,haas,interlagos,Sao Paulo,11,2019,20,27,Denmark,United States,93,Retired,Brakes,20,0,2
+TRUE,11,norris,mclaren,interlagos,Sao Paulo,11,2019,20,20,United Kingdom,United Kingdom,100,Finished,Finished,41,0,2
+TRUE,12,ricciardo,renault,interlagos,Sao Paulo,11,2019,20,30,Australia,France,100,Finished,Finished,46,0,4
+TRUE,13,giovinazzi,alfa,interlagos,Sao Paulo,11,2019,20,25,Italy,Italy,98,Finished,+1 Lap,4,0,2
+FALSE,14,hulkenberg,renault,interlagos,Sao Paulo,11,2019,20,32,Germany,France,98,Finished,+1 Lap,37,0,2
+TRUE,15,perez,force_india,interlagos,Sao Paulo,11,2019,20,29,Mexico,India,98,Finished,+1 Lap,44,0,1
+TRUE,16,kvyat,toro_rosso,interlagos,Sao Paulo,11,2019,20,25,Russia,Italy,98,Finished,+1 Lap,34,0,4
+FALSE,17,stroll,force_india,interlagos,Sao Paulo,11,2019,20,21,Canada,India,98,Finished,+1 Lap,1,0,1
+FALSE,18,russell,williams,interlagos,Sao Paulo,11,2019,20,21,United Kingdom,United Kingdom,96,Finished,+2 Laps,0,0,2
+FALSE,19,kubica,williams,interlagos,Sao Paulo,11,2019,20,34,Poland,United Kingdom,55,Retired,Oil leak,1,0,2
+TRUE,20,sainz,mclaren,interlagos,Sao Paulo,11,2019,20,25,Spain,United Kingdom,98,Finished,+1 Lap,80,0,2

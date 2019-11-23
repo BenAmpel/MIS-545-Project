@@ -2,7 +2,9 @@
 title: "Dataset Descriptions"
 author: "Tyler Campbell"
 date: "11/10/2019"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 \
